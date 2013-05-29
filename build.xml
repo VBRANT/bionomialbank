@@ -2,7 +2,7 @@
 
 <!-- The main build file. It merely imports the other files in the 'ant' directory. -->
 
-<project name="RefBank" default="all" basedir="." >
+<project name="BinoBank" default="all" basedir="." >
 	<include file="ant/config.ant" />
 	<include file="ant/import.ant" />
 	<include file="ant/dir.ant" />
