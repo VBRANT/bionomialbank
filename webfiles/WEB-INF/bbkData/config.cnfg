@@ -1,0 +1,12 @@
+// other settings (fill in the angle-bracketed parts with your actual data)
+accessUrl = "http://<serverName>:<portOfTomcat>/<BinoBank webapp name>/bbk";
+adminPasscode = "<yourNodePasscode>";
+domainName = "<yourBinoBankDomainName>";
+
+// EXAMPLE for other settings
+//domainName = "BinoBank-Boston-Dev";
+//accessUrl = "http://plazi2.cs.umb.edu:8080/BinoBank/bbk";
+//adminPasscode = "<noneOfYourBusiness>";
+
+// Stylesheet file required for admin page
+cssNames = "onnNodeAdminPage.css";

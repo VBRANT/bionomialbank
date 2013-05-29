@@ -1,0 +1,216 @@
+BinoBank data servlet (/BinoBank/bbk):
+
+    GET (response content depends on action parameter):
+
+        action=admin (also as /BinoBank/bbk/admin): retrieve login form for the BinoBank node administration HTML page (used in browser, not part of API)
+
+        action=nodes (also as /BinoBank/bbk/nodes): retrieve list of other BinoBank nodes known to this one
+            additional parameters: none
+            response (MIME type text/xml, encoding UTF-8):
+
+            <nodes>
+              <node name="name of BinoBank node" accessUrl="prefered access URL of node" />
+              <node ... />
+            </nodes>
+
+        action=ping (also as /BinoBank/bbk/ping): ping node
+            additional parameters: none
+            response (MIME type text/xml, encoding UTF-8):
+
+            <nodes />
+
+        action=name (also as /BinoBank/bbk/name): retrieve data of this BinoBank node
+            additional parameters: none
+            response (MIME type text/xml, encoding UTF-8):
+
+            <nodes>
+              <node name=&qout;<name of BinoBank node>&qout; accessUrl="prefered access URL of node" />
+            </nodes>
+
+        action=feed: retrieve the name update feed, ordered by increasing update time
+            additional parameters:
+                updatedSince: minimum update time for names to include in the feed, formatted as UTC HTTP timestamp
+            response: compact feed of names updated since the specified timestamp (MIME type text/xml, encoding UTF-8)
+
+            <nameSet>
+              <name id="name ID" canonicalId="ID of canonical name" deleted="deleted flag, true or false" createTime="UTC timestamp name was first added to BinoBank" updateTime="UTC timestamp name was last updated" localUpdateTime="UTC timestamp name was last updated on this BinoBank node" parseChecksum="MD5 hash of parsed version, if available" />
+              <name ... />
+            </nameSet>
+
+        action=get: resolve BinoBank internal identifiers
+            additional parameters:
+                id: the identifier(s) to resolve, can be multi-valued
+                format: the format to represent the parsed versions of names in (optional, defaults to the native MODS XML representation if omitted)
+            response: the name(s) with the speciefied identifier(s) (MIME type text/xml, encoding UTF-8)
+
+            <nameSet>
+              <name id="name ID" canonicalId="ID of canonical name" deleted="deleted flag, true or false" createTime="UTC timestamp name was first added to BinoBank" createUser="name of the user to first add name to BinoBank" createDomain="name of BinoBank node name was first added to" updateTime="UTC timestamp name was last updated" updateUser="name of the user to last update name" updateDomain="name of BinoBank node name was last updated at">
+                <nameString><plain name string></nameString>
+                <nameParsed><parsed version of name (if available), as DwC XML or in format specified by format parameter></nameParsed>
+              </name>
+              <name>...</name>
+            </nameSet>
+
+        action=find: search names
+            additional parameters:
+                query: full text query against name strings, can be multi-valued
+                combine: or or and, controls if multiple full text queries are combined conjunctively (the default) or disjunctively
+                type: taxonomic rank of name, only finds names with parsed version available
+                user: contributing user
+                higher: query against above family group epithets, i.e., infraorder and above, only finds names with parsed version available
+                family: query against family and tribe group epithets, i.e., superfamily down to infratribe, only finds names with parsed version available
+                genus: query against genus group epithets, i.e., genus down to subseries, only finds names with parsed version available
+                species: query against species group epithets, i.e., species aggregate and below, only finds names with parsed version available
+                authority: query against name authority, only finds names with parsed version available
+                format=concise: exclude parsed verion of names from response
+                format: the name of the format for representing the parsed verion of the names (defaults to the native MODS XML if not specified)
+            response: the names matching the specified search criteria (MIME type text/xml, encoding UTF-8)
+
+            <nameSet>
+              <name id="name ID" canonicalId="ID of canonical name" deleted="deleted flag, true or false" createTime="UTC timestamp name was first added to BinoBank" createUser="name of the user to first add name to BinoBank" createDomain="name of BinoBank node name was first added to" updateTime="UTC timestamp name was last updated" updateUser="name of the user to last update name" updateDomain="name of BinoBank node name was last updated at" parseChecksum="MD5 hash of parsed version, if available and format set to concise">
+                <nameString><plain name string></nameString>
+                <nameParsed><parsed version of name (if available), as container wrapped DwC XML></nameParsed>
+              </name>
+              <name ...>...</name>
+            </nameSet>
+
+    POST: requests from BinoBank node adminstration HTML page, infrastructure replication, or meta data updates for existing names:
+
+        /BinoBank/bbk/update: for deleting or un-deleting existing names or updating canonical name ID
+            request headers to set:
+                user: the user to credit for the update
+            request body:
+
+            <nameSet>
+              <name id="name ID" canonicalId="ID of canonical name to set" deleted="deleted flag to set, true or false"/>
+            </nameSet>
+
+            response (MIME type text/xml, encoding UTF-8):
+
+            <nameSet>
+              <name id="name ID" canonicalId="ID of canonical name" deleted="deleted flag, true or false" createTime="UTC timestamp name was first added to BinoBank" createUser="name of the user to first add name to BinoBank" createDomain="name of BinoBank node name was first added to" updateTime="UTC timestamp name was last updated" updateUser="name of the user to last update name" updateDomain="name of BinoBank node name was last updated at" parseChecksum="MD5 hash of parsed version, if available">
+                <nameString><plain name string></nameString>
+              </name>
+            </nameSet>
+
+        /BinoBank/bbk/admin: process input from the BinoBank node administration HTML page (used in browser, not part of API)
+
+        /BinoBank/bbk/nodes: retrieve list of other BinoBank nodes known to this one
+            request body: none
+            response (MIME type text/xml, encoding UTF-8):
+
+            <nodes>
+              <node name="name of BinoBank node" accessUrl="prefered access URL of node" />
+              <node ... />
+            </nodes>
+
+        /BinoBank/bbk/ping: ping node
+            request body: none
+            response (MIME type text/xml, encoding UTF-8):
+
+            <nodes />
+
+        /BinoBank/bbk/name: retrieve data of this BinoBank node
+            request body: none
+            response (MIME type text/xml, encoding UTF-8):
+
+            <nodes>
+              <node name="name of BinoBank node" accessUrl="prefered access URL of node" />
+            </nodes>
+
+        /BinoBank/bbk/introduce: introduce a new BinoBank node to this one, retrieve list of other known BinoBank nodes
+            request body (parameters):
+                name: the name of the BinoBank node introducing itself
+                accessUrl: the prefered access URL of the BinoBank node introducing itself
+            response (MIME type text/xml, encoding UTF-8):
+
+            <nodes>
+              <node name="name of BinoBank node" accessUrl="prefered access URL of node" />
+              <node ... />
+            </nodes>
+
+    PUT: upload new or update existing names:
+
+        request headers to set:
+            Data-Format: the upload data format, xml or txt (tried to auto-detect if not specified)
+            User-Name: the user to credit for uploaded names (defaults to 'Anonymous' if not specified)
+        request body: the names as plain text or wrapped in XML, corresponding to the format specified in the header; to be encoded in UTF-8
+            Data-Format=txt: one plain name string per line, adds new names, un-deletes ones that are re-added and were flagged as deleted
+            Data-Format=xml:
+
+            <nameSet>
+              <name>
+                <nameString><plain name string></nameString>
+                <nameParsed><parsed name in DwC XML, if available></nameParsed>
+              </name>
+              <name>...</name>
+            </nameSet>
+
+        response: update statistice (MIME type text/xml, encoding UTF-8), in particular the uploaded or otherwise updated names, with attributes indicating whether they were updated or alltogether newly added to BinoBank:
+
+        <nameSet created="number of names newly added to BinoBank" updated="number of names updated, less newly created ones">
+          <name id="name ID" canonicalId="ID of canonical name" deleted="deleted flag, true or false" createTime="UTC timestamp name was first added to BinoBank" updateTime="UTC timestamp name was last updated" parseChecksum="MD5 hash of parsed version, if available" parseError="explanation why parsed version was rejected, if any" created="true or false, indicating whether name was newly added to BinoBank" updated="true or false, indicating whether name existed and was updated">
+            <nameString><plain name string, as stored in BinoBank></nameString>
+          </name>
+          <name ...>...</name>
+        </nameSet>
+
+
+BinoBank search servlet (/BinoBank/search):
+
+    GET: retrieve search form, perform search, or retrieve styled or formatted name, depending on parameters:
+        id: identifier of name, yields name specific response if set, depending on several other parameters:
+            format: name format, for use with other software
+            isFramePage: send name specific pupup page instead of name proper?
+            combinations of the id and format parameters return different results:
+                id + format=PaRsEtHeNaMe + isFramePage=true: name specific popup page, with name opened for manual parsing in embedded IFrame (used in browser, not part of API)
+                id + format=EdItNaMeStRiNg + isFramePage=true: name specific popup page, with name string opened for manual editing in embedded IFrame (used in browser, not part of API)
+                id=MiNoRuPdATe, no style or format: return HTML form for POST callbacks from search result page (used in browser, not part of API)
+        canonicalStrinId: identifier of canonical representation, if set returns HTML page listing duplicate names (used in browser, not part of API)
+        query: full text query against name strings
+        type: taxonomic rank of name, only finds names with parsed version available
+        user: contributing user
+        higher: query against above family group epithets, i.e., infraorder and above, only finds names with parsed version available
+        family: query against family and tribe group epithets, i.e., superfamily down to infratribe, only finds names with parsed version available
+        genus: query against genus group epithets, i.e., genus down to subseries, only finds names with parsed version available
+        species: query against species group epithets, i.e., species aggregate and below, only finds names with parsed version available
+        authority: query against name authority, only finds names with parsed version available
+        any of query, higher, family, genus, species, or authority set: response is HTML page listing matching names (used in browser, not part of API)
+        no parameters at all: response is HTML page with search form (used in browser, not part of API)
+    
+    POST (used in browser, not part of API): receive update callbacks from search result page
+
+
+BinoBank upload servlet (/BinoBank/upload):
+
+    GET (used in browser, not part of API):
+
+        /BinoBank/upload: retrieve upload form
+
+        /BinoBank/upload/<upload-ID>/action: status info for running uploads
+
+    POST (used in browser, not part of API):
+
+        /BinoBank/upload: receive text area or file upload from browser
+
+    PUT: receive upload via script:
+        request headers to set:
+            Data-Format: name of the name data format used in request body (one of the formats selectable in the upload form)
+            User-Name: the name of the user to credit for the contributed names
+            Access-Key: the upload access key; needs to match configured key for servlet to accept the upload, ignored if no key is configured
+        request body: names in format inidcated in header
+        response: upload result statistics (MIME type text/plain, encoding UTF-8)
+
+        RECEIVED: <number of names received>
+        ERRORS: <number of names that contain errors>
+        CREATED: <number of names newly added to BinoBank>
+        UPDATED: <number of names that were not newly added, but had their parsed version updated>
+
+
+BinoBank data index servlet (/BinoBank/data):
+
+    GET: retrieve a list of name attribute values present from parsed names in BinoBank, for use as a gazetteer
+        parameters:
+            rank: taxonomic rank of epithets
+            mode: fetch epithets of whole rank group (mode=group), or only indicated rank (mode=rank, the default)?
+        response: list of epithets of requested rank (MIME type text/plain, encoding UTF-8)

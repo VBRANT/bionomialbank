@@ -1,0 +1,13 @@
+// relative URL of the parser and editor servlets
+nameParserUrl = "/BinoBank/parser";
+nameEditorUrl = "/BinoBank/editor";
+
+// Stylesheet file required for search results
+cssNames = "binoBankSearch.css";
+
+// JavaScript file required for search results (none for now)
+javaScriptNames = "";
+
+// taxonomic name formats linked to in search results
+//format.TCS = "TODO.xslt";
+//format.ABCD = "TODO.xslt";
