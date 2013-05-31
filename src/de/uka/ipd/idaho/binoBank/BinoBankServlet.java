@@ -130,6 +130,9 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 		String species = request.getParameter(SPECIES_RANK_GROUP_PARAMETER);
 		if (species != null)
 			detailPredicates.setProperty(SPECIES_RANK_GROUP_COLUMN_NAME, species);
+		String authority = request.getParameter(AUTHORITY_PARAMETER);
+		if (authority != null)
+			detailPredicates.setProperty(AUTHORITY_COLUMN_NAME, authority);
 	}
 	
 	/* (non-Javadoc)
@@ -147,20 +150,6 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 		indexData.addIndexAttribute(SPECIES_RANK_GROUP_COLUMN_NAME, refIndexData.species.toLowerCase());
 		indexData.addIndexAttribute(AUTHORITY_COLUMN_NAME, refIndexData.authority.toLowerCase());
 	}
-//	
-//	/* (non-Javadoc)
-//	 * @see de.uka.ipd.idaho.onn.stringPool.StringPoolServlet#extendIdentifierData(de.uka.ipd.idaho.onn.stringPool.StringPoolServlet.ParsedStringIdentifierData, de.uka.ipd.idaho.gamta.MutableAnnotation)
-//	 */
-//	protected void extendIdentifierData(ParsedStringIdentifierData identifierData, MutableAnnotation stringParsed) {
-//		Annotation[] ids = stringParsed.getAnnotations("mods:identifier");
-//		for (int i = 0; i < ids.length; i++) {
-//			String type = ((String) ids[i].getAttribute("type"));
-//			if ((type == null) || "RefBankID".equalsIgnoreCase(type))
-//				continue;
-//			String id = TokenSequenceUtils.concatTokens(ids[i], true, true).replaceAll("\\s", "");
-//			identifierData.addIdentifier(type, id);
-//		}
-//	}
 	
 	/*
 <dwc:Taxon>
@@ -285,16 +274,16 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 	}
 	
 	/* (non-Javadoc)
-	 * @see de.uka.ipd.idaho.binoBank.BinoBankClient#findNames(java.lang.String[], boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+	 * @see de.uka.ipd.idaho.binoBank.BinoBankClient#findNames(java.lang.String[], boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
 	 */
-	public PooledStringIterator findNames(String[] textPredicates, boolean disjunctive, String user, String higher, String family, String genus, String species, String authority) {
-		return this.findNames(textPredicates, disjunctive, user, higher, family, genus, species, authority, false);
+	public PooledStringIterator findNames(String[] textPredicates, boolean disjunctive, String user, String higher, String family, String genus, String species, String authority, String rank) {
+		return this.findNames(textPredicates, disjunctive, user, higher, family, genus, species, authority, rank, false);
 	}
-
+	
 	/* (non-Javadoc)
-	 * @see de.uka.ipd.idaho.binoBank.BinoBankClient#findNames(java.lang.String[], boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, boolean)
+	 * @see de.uka.ipd.idaho.binoBank.BinoBankClient#findNames(java.lang.String[], boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, boolean)
 	 */
-	public PooledStringIterator findNames(String[] textPredicates, boolean disjunctive, String user, String higher, String family, String genus, String species, String authority, boolean concise) {
+	public PooledStringIterator findNames(String[] textPredicates, boolean disjunctive, String user, String higher, String family, String genus, String species, String authority, String rank, boolean concise) {
 		Properties detailPredicates = new Properties();
 		if (higher != null)
 			detailPredicates.setProperty(HIGHER_RANK_GROUP_COLUMN_NAME, higher);
@@ -306,6 +295,6 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 			detailPredicates.setProperty(SPECIES_RANK_GROUP_COLUMN_NAME, species);
 		if (authority != null)
 			detailPredicates.setProperty(AUTHORITY_COLUMN_NAME, authority);
-		return this.findStrings(textPredicates, disjunctive, null, user, concise, detailPredicates);
+		return this.findStrings(textPredicates, disjunctive, rank, user, concise, detailPredicates);
 	}
 }

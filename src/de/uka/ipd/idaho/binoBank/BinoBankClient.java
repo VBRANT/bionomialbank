@@ -37,9 +37,10 @@ public interface BinoBankClient extends StringPoolClient {
 	 * @param genus taxonomic epithet between genus (inclusive) and species (exclusive)
 	 * @param species taxonomic epithet at species level or below
 	 * @param authority authority of taxonomic names (author and year)
+	 * @param rank rank of taxonomic names to find
 	 * @return an iterator over the references matching the query
 	 */
-	public abstract PooledStringIterator findNames(String[] textPredicates, boolean disjunctive, String user, String higher, String family, String genus, String species, String authority);
+	public abstract PooledStringIterator findNames(String[] textPredicates, boolean disjunctive, String user, String higher, String family, String genus, String species, String authority, String rank);
 	
 	/**
 	 * Search for taxonomic names, using both full text and detail predicates.
@@ -52,8 +53,9 @@ public interface BinoBankClient extends StringPoolClient {
 	 * @param genus taxonomic epithet between genus (inclusive) and species (exclusive)
 	 * @param species taxonomic epithet at species level or below
 	 * @param authority authority of taxonomic names (author and year)
+	 * @param rank rank of taxonomic names to find
 	 * @param concise obtain a concise result, i.e., without parses?
 	 * @return an iterator over the references matching the query
 	 */
-	public abstract PooledStringIterator findNames(String[] textPredicates, boolean disjunctive, String user, String higher, String family, String genus, String species, String authority, boolean concise);
+	public abstract PooledStringIterator findNames(String[] textPredicates, boolean disjunctive, String user, String higher, String family, String genus, String species, String authority, String rank, boolean concise);
 }

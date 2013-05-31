@@ -202,7 +202,7 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 		//	perform search if query given;
 		else if ((query != null) || (higher != null) || (family != null) || (genus != null) || (species != null)) {
 			String[] textPredicates = {query};
-			psi = bbc.findNames(textPredicates, false, user, higher, family, genus, species, authority, true);
+			psi = bbc.findNames(textPredicates, false, user, higher, family, genus, species, authority, rank, true);
 			if (psi.getException() != null)
 				throw psi.getException();
 		}

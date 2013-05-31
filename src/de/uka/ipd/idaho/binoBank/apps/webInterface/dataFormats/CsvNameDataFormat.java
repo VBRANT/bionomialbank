@@ -81,6 +81,7 @@ public class CsvNameDataFormat extends NameDataFormat {
 		
 		//	read data
 		final StringRelation data = StringRelation.readCsvData(in, StringRelation.GUESS_SEPARATOR, '"', true, null);
+		in.close();
 		
 		//	get ranks
 		final Rank[] ranks = rankSystem.getRanks();

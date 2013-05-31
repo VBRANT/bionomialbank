@@ -34,7 +34,7 @@ import de.uka.ipd.idaho.plugins.taxonomicNames.TaxonomicRankSystem.Rank;
  */
 public class TabTextNameDataFormat extends NameDataFormat {
 	
-	/** Constructor passing 'CSV' to super class
+	/** Constructor passing 'TabTXT' to super class
 	 */
 	public TabTextNameDataFormat() {
 		super("TabTXT");
@@ -104,8 +104,10 @@ public class TabTextNameDataFormat extends NameDataFormat {
 			public boolean hasNextName() throws IOException {
 				while (this.next == null) {
 					String dataLine = br.readLine();
-					if (dataLine == null)
+					if (dataLine == null) {
+						br.close();
 						return false;
+					}
 					
 					//	parse data line
 					String[] dataLineParts = dataLine.split("\\t");

@@ -46,11 +46,9 @@ import de.uka.ipd.idaho.plugins.taxonomicNames.TaxonomicRankSystem;
  */
 public abstract class NameDataFormat implements TaxonomicNameConstants {
 	
-	//	TODO implement this for DwC and SimpleDwC plus DwCRanks XML
+	//	TODO_ implement this for TCS XML ==> not covering all ranks, only one subspecific epithet possible in atomized representation
 	
-	//	TODO implement this for TCS XML
-	
-	//	TODO implement this for ABCD XML
+	//	TODO_ implement this for ABCD XML ==> not covering all ranks, only one subspecific epithet possible in atomized representation
 	
 	/** The taxonomic rank system to use for name handling */
 	protected static final TaxonomicRankSystem rankSystem = TaxonomicRankSystem.getRankSystem(null);
