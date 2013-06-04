@@ -1,0 +1,51 @@
+authorityName = "B0B0B0";
+authorityYear = "808080";
+
+domain = "FF8080";
+
+superKingdom = "FF9380";
+kingdom = "FFA680";
+subKingdom = "FFB980";
+infraKingdom = "FFCC80";
+
+superPhylum = "FFDF80";
+phylum = "FFF280";
+subPhylum = "F9FF80";
+infraPhylum = "E6FF80";
+
+superClass = "D2FF80";
+class = "BFFF80";
+subClass = "ACFF80";
+infraClass = "99FF80";
+
+superOrder = "86FF80";
+order = "80FF8C";
+subOrder = "80FF9F";
+infraOrder = "80FFB3";
+
+superFamily = "80FFC6";
+family = "80FFD9";
+subFamily = "80FFEC";
+infraFamily = "80FFFF";
+superTribe = "80ECFF";
+tribe = "80D9FF";
+subTribe = "80C6FF";
+infraTribe = "80B2FF";
+
+genus = "809FFF";
+subGenus = "808CFF";
+infraGenus = "8680FF";
+section = "9980FF";
+subSection = "AC80FF";
+series = "BF80FF";
+subSeries = "D280FF";
+
+speciesAggregate = "E680FF";
+species = "F980FF";
+subSpecies = "FF80F2";
+infraSpecies = "FF80DF";
+variety = "FF80CC";
+subVariety = "FF80B9";
+form = "FF80A6";
+subForm = "FF8093";
+
