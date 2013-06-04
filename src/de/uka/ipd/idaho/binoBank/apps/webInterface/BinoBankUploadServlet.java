@@ -209,12 +209,12 @@ public class BinoBankUploadServlet extends BinoBankWiServlet {
 			if (message == null) {
 				String dataFormatName = data.getFieldValue("dataFormat");
 				String userName = data.getFieldValue(USER_PARAMETER);
-				FieldValueInputStream refDataStream = data.getFieldByteStream("refFile");
-				if ((refDataStream == null) || (refDataStream.fieldLength == 0))
-					refDataStream = data.getFieldByteStream("refStrings");
+				FieldValueInputStream nameDataStream = data.getFieldByteStream("refFile");
+				if ((nameDataStream == null) || (nameDataStream.fieldLength == 0))
+					nameDataStream = data.getFieldByteStream("refStrings");
 				NameDataFormat dataFormat = this.getDataFormat(dataFormatName);
-				if ((refDataStream != null) && (dataFormat != null) && (userName != null)) {
-					AsynchronousUpload au = new AsynchronousUpload(data.id, refDataStream, dataFormat, data, userName);
+				if ((nameDataStream != null) && (dataFormat != null) && (userName != null)) {
+					AsynchronousUpload au = new AsynchronousUpload(data.id, nameDataStream, dataFormat, data, userName);
 					this.uploadHandler.enqueueRequest(au, userName);
 					message = ("Thank you for your contribution to BinoBank. Your references are being imported, you can monitor the import above.");
 					HtmlPageBuilder pageBuilder = this.getUploadStatusPageBuilder(request, au.id, message, response);
@@ -222,7 +222,7 @@ public class BinoBankUploadServlet extends BinoBankWiServlet {
 					return;
 				}
 				else {
-					if (refDataStream == null)
+					if (nameDataStream == null)
 						message = ("Please select a file to upload or enter references in the text area.");
 					else if (dataFormat == null)
 						message = ("The data format " + dataFormatName + " does not exist or cannot handle uploads.");
@@ -602,20 +602,20 @@ public class BinoBankUploadServlet extends BinoBankWiServlet {
 	}
 	
 	private class AsynchronousUpload extends AsynchronousRequest {
-		private FieldValueInputStream refDataStream;
+		private FieldValueInputStream nameDataStream;
 		private NameDataFormat dataFormat;
-		private FormDataReceiver refData;
+		private FormDataReceiver nameData;
 		UploadStringIterator usit;
 		String userName;
 		int created = 0;
 		int updated = 0;
 		int total = 0;
 		UploadStringError[] errors = null;
-		AsynchronousUpload(String name, FieldValueInputStream refDataStream, NameDataFormat dataFormat, FormDataReceiver data, String userName) {
+		AsynchronousUpload(String name, FieldValueInputStream nameDataStream, NameDataFormat dataFormat, FormDataReceiver data, String userName) {
 			super(name);
-			this.refDataStream = refDataStream;
+			this.nameDataStream = nameDataStream;
 			this.dataFormat = dataFormat;
-			this.refData = data;
+			this.nameData = data;
 			this.userName = userName;
 		}
 		protected void init() throws Exception {
@@ -624,11 +624,11 @@ public class BinoBankUploadServlet extends BinoBankWiServlet {
 			this.setStatus("Setting up data import.");
 			
 			//	create iterator
-			String encoding = this.refDataStream.getEncoding();
+			String encoding = this.nameDataStream.getEncoding();
 			if (encoding == null)
 				encoding = "ISO-8859-1";
 			System.out.println("IMPORT DATA ENCODING IS " + encoding);
-			this.usit = this.dataFormat.streamParseNames(new InputStreamReader(new FilterInputStream(this.refDataStream) {
+			this.usit = this.dataFormat.streamParseNames(new InputStreamReader(new FilterInputStream(this.nameDataStream) {
 				public int read() throws IOException {
 					int r = super.read();
 					if ((r >= 32) || (r == 10) || (r == 13) || (r < 0))
@@ -652,7 +652,7 @@ public class BinoBankUploadServlet extends BinoBankWiServlet {
 			
 			//	update status
 			this.setStatus("Data import running, so far" +
-					" " + this.usit.getTotalCount() + " references extracted" +
+					" " + this.usit.getTotalCount() + " taxonomic names extracted" +
 					", " + this.usit.getValidCount() + " valid ones" +
 					", " + ((this.usit.getErrorCount() == 0) ? "no errors" : (this.usit.getErrorCount() + " errors")) +
 					", " + this.total + " imported (" + this.created + " new / " + this.updated + " updated)" +
@@ -694,17 +694,17 @@ public class BinoBankUploadServlet extends BinoBankWiServlet {
 				}
 				
 				//	update progress percentage
-				if (this.refDataStream.getBytesRead() == this.refDataStream.fieldLength) {
+				if (this.nameDataStream.getBytesRead() == this.nameDataStream.fieldLength) {
 					int erc = (this.usit.getTotalCount() + this.usit.estimateRemaining());
 					if (erc < 1)
 						erc = 1;
 					this.setPercentFinished((this.usit.getTotalCount() * 100) / erc);
 				}
-				else this.setPercentFinished((this.refDataStream.getBytesRead() * 100) / this.refDataStream.fieldLength);
+				else this.setPercentFinished((this.nameDataStream.getBytesRead() * 100) / this.nameDataStream.fieldLength);
 				
 				//	update status
 				this.setStatus("Data import running, so far" +
-						" " + this.usit.getTotalCount() + " references extracted" +
+						" " + this.usit.getTotalCount() + " taxonomic names extracted" +
 						", " + this.usit.getValidCount() + " valid ones" +
 						", " + ((this.usit.getErrorCount() == 0) ? "no errors" : (this.usit.getErrorCount() + " errors")) +
 						", " + this.total + " imported (" + this.created + " new / " + this.updated + " updated)" +
@@ -724,17 +724,17 @@ public class BinoBankUploadServlet extends BinoBankWiServlet {
 			//	update status
 			this.setPercentFinished(100);
 			this.setStatus("Data import finished," +
-					" " + this.usit.getTotalCount() + " references extracted" +
+					" " + this.usit.getTotalCount() + " taxonomic names extracted" +
 					", " + this.usit.getValidCount() + " valid ones" +
 					", " + ((this.usit.getErrorCount() == 0) ? "no errors" : (this.usit.getErrorCount() + " errors")) +
 					", " + this.total + " imported (" + this.created + " new / " + this.updated + " updated)" +
 					".");
 			
 			//	close data stream
-			this.refDataStream.close();
+			this.nameDataStream.close();
 		}
 		protected void cleanup() throws Exception {
-			this.refData.dispose();
+			this.nameData.dispose();
 		}
 		public String getResultLink(HttpServletRequest request) {
 			return (request.getContextPath() + request.getServletPath());

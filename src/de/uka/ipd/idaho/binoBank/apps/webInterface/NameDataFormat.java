@@ -482,7 +482,7 @@ public abstract class NameDataFormat implements TaxonomicNameConstants {
 	 * @throws IOException
 	 */
 	public UploadStringIterator streamParseNames(Reader in) throws IOException {
-		final ParsedTaxonomicNameIterator refs = this.streamParse(in);
+		final ParsedTaxonomicNameIterator names = this.streamParse(in);
 		return new UploadStringIterator() {
 			int usTotal = 0;
 			int usValid = 0;
@@ -501,7 +501,7 @@ public abstract class NameDataFormat implements TaxonomicNameConstants {
 				return this.usTotal;
 			}
 			public int estimateRemaining() {
-				return refs.estimateRemaining();
+				return names.estimateRemaining();
 			}
 			public UploadString nextUploadString() throws IOException {
 				UploadString us = this.next;
@@ -512,11 +512,11 @@ public abstract class NameDataFormat implements TaxonomicNameConstants {
 				if (this.next != null)
 					return true;
 				
-				if (!refs.hasNextName())
+				if (!names.hasNextName())
 					return false;
 				
 				//	get next data set
-				ParsedTaxonomicName taxName = refs.nextName();
+				ParsedTaxonomicName taxName = names.nextName();
 				this.usTotal++;
 				
 				//	check error

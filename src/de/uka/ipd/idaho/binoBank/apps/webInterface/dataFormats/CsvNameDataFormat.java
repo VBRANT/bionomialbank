@@ -104,8 +104,11 @@ public class CsvNameDataFormat extends NameDataFormat {
 					for (int k = 0; k < keys.size(); k++) {
 						String key = keys.get(k);
 						String nKey = rankNameMappings.getProperty(key, key);
-						if (!key.equals(nKey))
-							st.renameKey(key, nKey);
+						if (!key.equals(nKey)) {
+							String value = st.getValue(key);
+							if (value != null)
+								st.setValue(nKey, value);
+						}
 					}
 					
 					//	get epithets
