@@ -70,8 +70,10 @@ public class BinoBankParserServlet extends BinoBankAppServlet implements Taxonom
 	private Properties nameParseParams = new Properties();
 	
 	private TaxonomicRankSystem rankSystem;
+	private Rank[] ranks;
 	private HashMap ranksByName = new HashMap();
-
+	private String[][] rankAbbreviations;
+	
 	/* (non-Javadoc)
 	 * @see de.uka.ipd.idaho.goldenGate.webServices.WebServiceFrontendServlet#doInit()
 	 */
@@ -81,10 +83,18 @@ public class BinoBankParserServlet extends BinoBankAppServlet implements Taxonom
 		//	get generic rank system (we'll be handling names from all domains)
 		this.rankSystem = TaxonomicRankSystem.getRankSystem(null);
 		
-		//	index ranks
-		Rank[] ranks = this.rankSystem.getRanks();
-		for (int r = 0; r < ranks.length; r++)
-			this.ranksByName.put(ranks[r].name, ranks[r]);
+		//	get ranks, index them, and store abbreviations
+		this.ranks = this.rankSystem.getRanks();
+		this.rankAbbreviations = new String[this.ranks.length][];
+		for (int r = 0; r < this.ranks.length; r++) {
+			this.ranksByName.put(this.ranks[r].name, this.ranks[r]);
+			this.rankAbbreviations[r] = this.ranks[r].getAbbreviations();
+			for (int a = 0; a < this.rankAbbreviations[r].length; a++) {
+				if (this.rankAbbreviations[r][a].endsWith("."))
+					this.rankAbbreviations[r][a] = this.rankAbbreviations[r][a].substring(0, (this.rankAbbreviations[r][a].length() - 1));
+				this.rankAbbreviations[r][a] = this.rankAbbreviations[r][a].toLowerCase();
+			}
+		}
 		
 		//	create parse handler
 		this.parseHandler = new AsynchronousParsingHandler();
@@ -253,9 +263,81 @@ public class BinoBankParserServlet extends BinoBankAppServlet implements Taxonom
 					taxNameAnnot.tokenAt(t).removeAttribute("C");
 			}
 			
-			//	TODO perform primitive parse using suffixes and abbreviations from rank system if no parse given
-			else {
+			//	perform primitive parse using suffixes and abbreviations from rank system if no parse given
+			else  {
 				
+				//	rank epithets occur in decending order
+				int firstPossibleRankIndex = 0;
+				
+				//	authority starts where last epithet ends
+				int authorityStartIndex = 0;
+				
+				//	try to find epithets first, using labels and suffixes
+				for (int t = 0; t < taxNameAnnot.size(); t++) {
+					String token = taxNameAnnot.valueAt(t).toLowerCase();
+					
+					//	possible punctiation of hybrid or higher classification in parenthesis
+					if ("x".equals(token) || "(".equals(token)) {
+						firstPossibleRankIndex = 0;
+						continue;
+					}
+					
+					//	try and match ranks
+					Rank matchedRank = null;
+					int matchedRankIndex = 0;
+					int matchedSuffixLength = 0;
+					for (int r = firstPossibleRankIndex; r < ranks.length; r++) {
+						
+						//	try suffixes first
+						if (token.endsWith(ranks[r].getSuffix().toLowerCase()) && (matchedSuffixLength < ranks[r].getSuffix().length())) {
+							matchedRank = ranks[r];
+							matchedRankIndex = r;
+							matchedSuffixLength = ranks[r].getSuffix().length();
+							continue;
+						}
+						
+						//	match found, we're done
+						if (matchedRank != null)
+							break;
+						
+						//	no place 
+						if ((t < 1) || (".".equals(taxNameAnnot.valueAt(t-1)) && (t < 2)))
+							continue;
+						String abbreviation = (".".equals(taxNameAnnot.valueAt(t-1)) ? taxNameAnnot.valueAt(t-2) : taxNameAnnot.valueAt(t-1)).toLowerCase();
+						for (int a = 0; a < rankAbbreviations[r].length; a++) {
+							if (abbreviation.equals(rankAbbreviations[r][a])) {
+								matchedRank = ranks[r];
+								matchedRankIndex = r;
+								break;
+							}
+						}
+						if (matchedRank != null)
+							break;
+					}
+					
+					//	annotate any rank we matched
+					if (matchedRank != null) {
+						taxNameAnnot.addAnnotation(matchedRank.name, t, 1);
+						authorityStartIndex = (t+1);
+						firstPossibleRankIndex = (matchedRankIndex + 1);
+					}
+				}
+				
+				//	try to find authority if some epithet found
+				if (authorityStartIndex != 0) {
+					int authorityNameEndIndex = taxNameAnnot.size();
+					
+					//	try to find year from end
+					for (int t = taxNameAnnot.size()-1; t >= authorityStartIndex; t--)
+						if (taxNameAnnot.valueAt(t).matches("[12][0-9]{3}")) {
+							taxNameAnnot.addAnnotation(AUTHORITY_YEAR_ATTRIBUTE, t, 1);
+							authorityNameEndIndex = t;
+						}
+					
+					//	annotate name
+					if (authorityStartIndex < authorityNameEndIndex)
+						taxNameAnnot.addAnnotation(AUTHORITY_NAME_ATTRIBUTE, authorityStartIndex, (authorityNameEndIndex - authorityStartIndex));
+				}
 			}
 			
 			//	update status
@@ -409,13 +491,12 @@ public class BinoBankParserServlet extends BinoBankAppServlet implements Taxonom
 	}
 	
 	private CountingTokenSequence[] extractDetails(MutableAnnotation nameDoc, Properties storedDetails) {
-		Rank[] ranks = this.rankSystem.getRanks();
 		TaxonomicName taxName = TaxonomicNameUtils.dwcXmlToTaxonomicName(nameDoc, this.rankSystem);
 		ArrayList ctss = new ArrayList();
-		for (int r = 0; r < ranks.length; r++) {
-			String epithet = taxName.getEpithet(ranks[r].name);
+		for (int r = 0; r < this.ranks.length; r++) {
+			String epithet = taxName.getEpithet(this.ranks[r].name);
 			if (epithet != null)
-				ctss.add(new CountingTokenSequence(ranks[r].name, Gamta.newTokenSequence(epithet, nameDoc.getTokenizer())));
+				ctss.add(new CountingTokenSequence(this.ranks[r].name, Gamta.newTokenSequence(epithet, nameDoc.getTokenizer())));
 		}
 		String authorityName = taxName.getAuthorityName();
 		if (authorityName != null)
@@ -500,7 +581,6 @@ public class BinoBankParserServlet extends BinoBankAppServlet implements Taxonom
 				this.typeHighlightColors.put(AUTHORITY_NAME_ATTRIBUTE, ((rgbAn == null) ? Color.getHSBColor(((float) Math.random()), 0.5f, 1.0f) : FeedbackPanel.getColor(rgbAn)));
 				String rgbAy = highlightColors.getSetting(AUTHORITY_YEAR_ATTRIBUTE);
 				this.typeHighlightColors.put(AUTHORITY_YEAR_ATTRIBUTE, ((rgbAy == null) ? Color.getHSBColor(((float) Math.random()), 0.5f, 1.0f) : FeedbackPanel.getColor(rgbAy)));
-				Rank[] ranks = rankSystem.getRanks();
 				for (int r = 0; r < ranks.length; r++) {
 					String rgb = highlightColors.getSetting(ranks[r].name);
 					this.typeHighlightColors.put(ranks[r].name, ((rgb == null) ? Color.getHSBColor(((float) Math.random()), 0.5f, 1.0f) : FeedbackPanel.getColor(rgb)));
