@@ -42,7 +42,9 @@ In addition, the Ant build script checks if these projects are present in your w
 
 - idaho-extensions (http://code.google.com/p/idaho-extensions/)
 
-- openstringpool (https://git.scratchpads.eu/v/openstringpool.git)
+- openstringpool (http://git.scratchpads.eu/v/openstringpool.git)
+
+- java-uuid-generator (http://github.com/cowtowncoder/java-uuid-generator/)
 
 
 

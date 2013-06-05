@@ -17,10 +17,16 @@
  */
 package de.uka.ipd.idaho.binoBank;
 
+import java.io.IOException;
+import java.util.LinkedList;
 import java.util.Properties;
+import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+
+import com.fasterxml.uuid.Generators;
+import com.fasterxml.uuid.impl.NameBasedGenerator;
 
 import de.uka.ipd.idaho.easyIO.sql.TableDefinition;
 import de.uka.ipd.idaho.gamta.Annotation;
@@ -296,5 +302,56 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 		if (authority != null)
 			detailPredicates.setProperty(AUTHORITY_COLUMN_NAME, authority);
 		return this.findStrings(textPredicates, disjunctive, rank, user, concise, detailPredicates);
+	}
+	
+	/**
+	 * Overwrites ID generation to use UUID version 5 with 'globalnames.org' in
+	 * the DNS namespace, also using an instance pool for increased performance.
+	 * However, the UUIDs are converted to plain 32 character HEX strings to
+	 * comply with the contract of this method.
+	 * @see de.uka.ipd.idaho.onn.stringPool.StringPoolServlet#getStringId(java.lang.String)
+	 */
+	protected String getStringId(String string) throws IOException {
+		NameBasedGenerator nbg = null;
+		try {
+			nbg = getNameBasedGenerator();
+			UUID id = nbg.generate(string.getBytes("UTF-8"));
+			String ids = id.toString();
+			return ids;
+		}
+		finally {
+			returnNameBasedGenerator(nbg);
+		}
+	}
+	
+	private static UUID globalNamesInDns;
+	private static LinkedList checksumDigesters = new LinkedList();
+	private static NameBasedGenerator getNameBasedGenerator() throws IOException {
+		synchronized (checksumDigesters) {
+			if (checksumDigesters.size() != 0)
+				return ((NameBasedGenerator) checksumDigesters.removeFirst());
+			if (globalNamesInDns == null) {
+				NameBasedGenerator nbg = Generators.nameBasedGenerator(NameBasedGenerator.NAMESPACE_DNS);
+				globalNamesInDns = nbg.generate("globalnames.org");
+			}
+			return Generators.nameBasedGenerator(globalNamesInDns);
+		}
+	}
+	private static void returnNameBasedGenerator(NameBasedGenerator nbg) {
+		if (nbg == null)
+			return;
+		synchronized (checksumDigesters) {
+			checksumDigesters.addLast(nbg);
+		}
+	}
+	public static void main(String[] args) throws Exception {
+		NameBasedGenerator nbg = getNameBasedGenerator();
+		UUID id = nbg.generate("test".getBytes("UTF-8"));
+//		UUID id = nbg.generate("Pardosa moesta Banks, 1892".getBytes("UTF-8"));
+//		UUID id = nbg.generate("Pardosa moesta".getBytes("UTF-8"));
+//		UUID id = nbg.generate("Pardosa moesta Paquin & Dupérré, 2003".getBytes("UTF-8"));
+		String ids = id.toString();
+		System.out.println(ids);
+		System.out.println(ids.replaceAll("\\-", "").toUpperCase());
 	}
 }
