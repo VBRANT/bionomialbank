@@ -35,5 +35,5 @@
 	<property name="jar.file" value="${build.home}/WEB-INF/lib/${app.name}.jar" />
 	
 	<!-- path to the .war file that shall be created -->
-	<property name="war.file" value="${dist.home}/${app.name}.war" />
+	<property name="zip.file" value="${dist.home}/${app.name}.zip" />
 </project>
