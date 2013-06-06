@@ -50,14 +50,17 @@ In addition, the Ant build script checks if these projects are present in your w
 
 SETTING UP A BinoBank NODE
 
-Download BinoBank.war into Tomcat's webapps folder
-Instead, you can also check out the project from GIT, build the WAR file using Ant, and then deploy BinoBank.war to your Tomcat
+Download BinoBank.zip into Tomcat's webapps folder (an exploded archive directory, zipped up for your convenience; WAR deployment is impractical, as updates would uverwrite the configurations you make)
+Instead, you can also check out the project from GIT, build the ZIP file using Ant, and then deploy BinoBank.zip to your Tomcat
 
-Call http://localhost:8080/BinoBank/bbk to make Tomcat extract BinoBank.war
-(you might have to re-start Tomcat for it to recognize the WAR file)
-(adjust server name and port if working remotely or Tomcat runs on a different port, respectively)
+Create a BinoBank sub folder in Tomcat's webapps folder.
 
-Tomcat's webapps folder should have a BinoBank sub folder now, and it's time for some configuration:
+Un-zip the exploded archive directory into the BinoBank folder.
+If you have WebAppUpdater (builds with idaho-core) installed, you can also simply type "bash update BinoBank" in the console.
+
+Put BinoBank.zip into the BinoBank folder for others to download.
+
+Now, it's time for some configuration:
 
     To enable the BinoBank node to store parsed taxonomic names in the file system and connect to other BinoBank nodes, give the web application the permission to create and manipulate files and folders within its deployment folder and to establish outgoing network connections (there are two ways to achieve this):
 
@@ -172,3 +175,5 @@ To customize page header, navigation, or footer, customize the respective HTML f
     This can include adding new <includeFile .../> tags; when doing this, make sure that the references files exist (requires the web application to run for testing)
 
 Do not add header, navigation, or footer content to the binoBank.html or binoBankPopup.html files directly, but use the respective inserted files insted (requires the web application to run for testing)
+
+If you alter any other files, include them in the update.cnfg file (with full path, starting with WEB-INF) so they are not replaced in case of an update.
