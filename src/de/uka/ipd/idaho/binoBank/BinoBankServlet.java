@@ -314,22 +314,22 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 	protected String getStringId(String string) throws IOException {
 		NameBasedGenerator nbg = null;
 		try {
-			nbg = getNameBasedGenerator();
+			nbg = getUuidGenerator();
 			UUID id = nbg.generate(string.getBytes("UTF-8"));
 			String ids = id.toString();
 			return ids;
 		}
 		finally {
-			returnNameBasedGenerator(nbg);
+			returnUuidGenerator(nbg);
 		}
 	}
 	
 	private static UUID globalNamesInDns;
-	private static LinkedList checksumDigesters = new LinkedList();
-	private static NameBasedGenerator getNameBasedGenerator() throws IOException {
-		synchronized (checksumDigesters) {
-			if (checksumDigesters.size() != 0)
-				return ((NameBasedGenerator) checksumDigesters.removeFirst());
+	private static LinkedList uuidGenerators = new LinkedList();
+	private static NameBasedGenerator getUuidGenerator() throws IOException {
+		synchronized (uuidGenerators) {
+			if (uuidGenerators.size() != 0)
+				return ((NameBasedGenerator) uuidGenerators.removeFirst());
 			if (globalNamesInDns == null) {
 				NameBasedGenerator nbg = Generators.nameBasedGenerator(NameBasedGenerator.NAMESPACE_DNS);
 				globalNamesInDns = nbg.generate("globalnames.org");
@@ -337,15 +337,15 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 			return Generators.nameBasedGenerator(globalNamesInDns);
 		}
 	}
-	private static void returnNameBasedGenerator(NameBasedGenerator nbg) {
+	private static void returnUuidGenerator(NameBasedGenerator nbg) {
 		if (nbg == null)
 			return;
-		synchronized (checksumDigesters) {
-			checksumDigesters.addLast(nbg);
+		synchronized (uuidGenerators) {
+			uuidGenerators.addLast(nbg);
 		}
 	}
 	public static void main(String[] args) throws Exception {
-		NameBasedGenerator nbg = getNameBasedGenerator();
+		NameBasedGenerator nbg = getUuidGenerator();
 		UUID id = nbg.generate("test".getBytes("UTF-8"));
 //		UUID id = nbg.generate("Pardosa moesta Banks, 1892".getBytes("UTF-8"));
 //		UUID id = nbg.generate("Pardosa moesta".getBytes("UTF-8"));
