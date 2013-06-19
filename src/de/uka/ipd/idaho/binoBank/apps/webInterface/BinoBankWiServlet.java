@@ -79,7 +79,7 @@ public class BinoBankWiServlet extends BinoBankAppServlet {
 		out.writeLine("  setAttribute(umRoot, 'align', 'right');");
 		out.writeLine("  var undl = document.createElement('span');");
 		out.writeLine("  setAttribute(undl, 'id', 'userNameDisplayLabel');");
-		out.writeLine("  undl.appendChild(document.createTextNode(getUser('silent') ? 'Currently credited as:' : 'Please enter your name so RefBank can credit your contributions'));");
+		out.writeLine("  undl.appendChild(document.createTextNode(getUser('silent') ? 'Currently credited as:' : 'Please enter your name so BinoBank can credit your contributions'));");
 		out.writeLine("  umRoot.appendChild(undl);");
 		out.writeLine("  var unds = document.createElement('span');");
 		out.writeLine("  setAttribute(unds, 'id', 'userNameDisplaySpan');");

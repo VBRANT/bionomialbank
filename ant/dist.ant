@@ -5,7 +5,7 @@
 -->
 
 <project name="dist">
-	<target name="zip" depends="jar">
+	<target name="zip" depends="jar,dataformats">
 		<delete file="${zip.file}" />
 		<zip destfile="${zip.file}">
 			<fileset dir="${build.home}">
@@ -18,6 +18,25 @@
 	
 	<target name="jar">
 		<delete file="${jar.file}" />
-		<jar destfile="${jar.file}" basedir="${build.home}/classes" />
+		<jar destfile="${jar.file}">
+			<fileset dir="${build.home}/classes">
+				<exclude name="**/dataFormats/**" />
+			</fileset>
+			<fileset dir="${src.home}">
+				<exclude name="**/dataFormats/**" />
+			</fileset>
+		</jar>
+	</target>
+	
+	<target name="dataformats">
+		<delete file="${jar.dataformats.file}" />
+		<jar destfile="${jar.dataformats.file}">
+			<fileset dir="${build.home}/classes">
+				<include name="**/dataFormats/*.class" />
+			</fileset>
+			<fileset dir="${src.home}">
+				<include name="**/dataFormats/*.java" />
+			</fileset>
+		</jar>
 	</target>
 </project>

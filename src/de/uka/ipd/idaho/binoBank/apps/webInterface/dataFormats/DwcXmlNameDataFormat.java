@@ -65,10 +65,13 @@ public class DwcXmlNameDataFormat extends NameDataFormat {
 	 * @see de.uka.ipd.idaho.binoBank.apps.webInterface.NameDataFormat#getInputDescription()
 	 */
 	public String getDescription() {
-		return "<html>This format parses atomized taxonomic names provided tab delimited text format.<br/>" +
-				"The column headers can be in DarwinCore or Simple DarwinCore, supplemented DarwinCore Additional Ranks,<br/>" +
-				"or using the generic attribute names defined by the constants in<br/>" +
-				"<a href=\"http://code.google.com/p/idaho-extensions/source/browse/src/de/uka/ipd/idaho/plugins/taxonomicNames/TaxonomicNameConstants.java\">de.uka.ipd.idaho.plugins.taxonomicNames.TaxonomicNameConstants.java</a></html>";
+		return "<html>This format parses atomized taxonomic names provided in XML format.<br/>" +
+				"The detail element names can be in DarwinCore or Simple DarwinCore, supplemented DarwinCore Additional Ranks,<br/>" +
+				"or the generic names defined (even though as attributes) by the constants in<br/>" +
+				"<a href=\"http://code.google.com/p/idaho-extensions/source/browse/src/de/uka/ipd/idaho/plugins/taxonomicNames/TaxonomicNameConstants.java\">de.uka.ipd.idaho.plugins.taxonomicNames.TaxonomicNameConstants.java</a><br/>" +
+				"The name of the container element delimiting individual taxonomic names can be specified in the <code>taxonNameElement</code><br/>" +
+				"attribute of the root element; if lacking, it defaults to <code>taxonomicName</code>.<br/>" +
+				"A root element for the entire upload file has to be present, but its name does not matter.</html>";
 	}
 	
 	/* (non-Javadoc)

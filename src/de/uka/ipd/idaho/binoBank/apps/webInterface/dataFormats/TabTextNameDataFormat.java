@@ -58,7 +58,7 @@ public class TabTextNameDataFormat extends NameDataFormat {
 	 * @see de.uka.ipd.idaho.binoBank.apps.webInterface.NameDataFormat#getInputDescription()
 	 */
 	public String getDescription() {
-		return "<html>This format parses atomized taxonomic names provided tab delimited text format.<br/>" +
+		return "<html>This format parses atomized taxonomic names provided in tab delimited text format.<br/>" +
 				"The column headers can be in DarwinCore or Simple DarwinCore, supplemented DarwinCore Additional Ranks,<br/>" +
 				"or using the generic attribute names defined by the constants in<br/>" +
 				"<a href=\"http://code.google.com/p/idaho-extensions/source/browse/src/de/uka/ipd/idaho/plugins/taxonomicNames/TaxonomicNameConstants.java\">de.uka.ipd.idaho.plugins.taxonomicNames.TaxonomicNameConstants.java</a></html>";

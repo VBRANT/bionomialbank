@@ -166,7 +166,7 @@ public class BinoBankUploadServlet extends BinoBankWiServlet {
 		//	parse request
 		try {
 			HashSet fileFieldSet = new HashSet(2);
-			fileFieldSet.add("refFile");
+			fileFieldSet.add("nameFile");
 			FormDataReceiver data = FormDataReceiver.receive(request, uploadMaxLength, this.uploadCacheFolder, 1024, fileFieldSet);
 			
 			//	check ReCAPTCHA
@@ -187,7 +187,7 @@ public class BinoBankUploadServlet extends BinoBankWiServlet {
 						}
 					};
 					reCapchaErrorInputTransfer.setProperty("dataFormat", data.getFieldValue("dataFormat"));
-					FieldValueInputStream refStringIn = data.getFieldByteStream("refStrings");
+					FieldValueInputStream refStringIn = data.getFieldByteStream("nameStrings");
 					String encoding = refStringIn.getEncoding();
 					if (encoding == null)
 						encoding = "ISO-8859-1";
@@ -199,8 +199,8 @@ public class BinoBankUploadServlet extends BinoBankWiServlet {
 					while ((r = refStringReader.read(refStringBuffer, 0, refStringBuffer.length)) != -1)
 						refStringWriter.write(refStringBuffer, 0, r);
 					refStringWriter.flush();
-					reCapchaErrorInputTransfer.setProperty("refStrings", refStringWriter.toString());
-					reCapchaErrorInputTransfer.setProperty("refFile", data.getSourceFileName("refFile"));
+					reCapchaErrorInputTransfer.setProperty("nameStrings", refStringWriter.toString());
+					reCapchaErrorInputTransfer.setProperty("nameFile", data.getSourceFileName("nameFile"));
 					reCapchaErrorInputTransfer.setProperty(USER_PARAMETER, data.getFieldValue(USER_PARAMETER));
 				}
 			}
@@ -209,21 +209,21 @@ public class BinoBankUploadServlet extends BinoBankWiServlet {
 			if (message == null) {
 				String dataFormatName = data.getFieldValue("dataFormat");
 				String userName = data.getFieldValue(USER_PARAMETER);
-				FieldValueInputStream nameDataStream = data.getFieldByteStream("refFile");
+				FieldValueInputStream nameDataStream = data.getFieldByteStream("nameFile");
 				if ((nameDataStream == null) || (nameDataStream.fieldLength == 0))
-					nameDataStream = data.getFieldByteStream("refStrings");
+					nameDataStream = data.getFieldByteStream("nameStrings");
 				NameDataFormat dataFormat = this.getDataFormat(dataFormatName);
 				if ((nameDataStream != null) && (dataFormat != null) && (userName != null)) {
 					AsynchronousUpload au = new AsynchronousUpload(data.id, nameDataStream, dataFormat, data, userName);
 					this.uploadHandler.enqueueRequest(au, userName);
-					message = ("Thank you for your contribution to BinoBank. Your references are being imported, you can monitor the import above.");
+					message = ("Thank you for your contribution to BinoBank. Your taxonomic names are being imported, you can monitor the import above.");
 					HtmlPageBuilder pageBuilder = this.getUploadStatusPageBuilder(request, au.id, message, response);
 					this.sendHtmlPage(pageBuilder);
 					return;
 				}
 				else {
 					if (nameDataStream == null)
-						message = ("Please select a file to upload or enter references in the text area.");
+						message = ("Please select a file to upload or enter taxonomic names in the text area.");
 					else if (dataFormat == null)
 						message = ("The data format " + dataFormatName + " does not exist or cannot handle uploads.");
 				}
