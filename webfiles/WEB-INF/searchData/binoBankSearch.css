@@ -38,22 +38,25 @@
 #queryField {
     width: 100%;
 }
-#typeField {
+#rankField {
     width: 100%;
 }
-#authorField {
+#authorityField {
     width: 100%;
 }
-#titleField {
+#higherField {
     width: 100%;
 }
-#yearField {
+#familyField {
     width: 100%;
 }
-#originField {
+#genusField {
     width: 100%;
 }
-#refCodeFrame {
+#speciesField {
+    width: 100%;
+}
+#nameCodeFrame {
     background-color: silver;
     color: navy;
     width: 100%;
@@ -82,7 +85,7 @@
 
 .resultOptions {}
 
-.referenceString {
+.nameString {
     background-color: white;
     color: navy;
     padding: 0.5em 1em 0.5em;
@@ -94,12 +97,12 @@
     border-radius: 0.5em;
 }
 
-.referenceFormatLinkLabel {
+.rnameFormatLinkLabel {
     font-size: 60%;
     color: navy;
 }
 
-.referenceFormatLink {
+.nameFormatLink {
     font-size: 60%;
     font-weight: bold;
     background: silver;

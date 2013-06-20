@@ -120,12 +120,12 @@ public class BinoBankParserServlet extends BinoBankAppServlet implements Taxonom
 		//	check for invokation
 		String user = request.getParameter(USER_PARAMETER);
 		if (user == null) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Reference ID, User Name, or Result URL Missing");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Taxonomic Name ID, User Name, or Result URL Missing");
 			return;
 		}
 		String apId = this.parseHandler.createRequest(request, user);
 		if (apId == null) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Reference ID, User Name, or Result URL Missing");
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Taxonomic Name ID, User Name, or Result URL Missing");
 			return;
 		}
 		
@@ -234,7 +234,7 @@ public class BinoBankParserServlet extends BinoBankAppServlet implements Taxonom
 			//	get parsed name
 			MutableAnnotation parsedNameDoc = null;
 			if (this.name.getStringParsed() != null)	try {
-//				System.out.println("GOT PARSED REF: " + this.name.getStringParsed());
+//				System.out.println("GOT PARSED NAME: " + this.name.getStringParsed());
 				parsedNameDoc = Gamta.newDocument(Gamta.newTokenSequence("", taxNameDoc.getTokenizer()));
 				SgmlDocumentReader.readDocument(new StringReader(this.name.getStringParsed()), parsedNameDoc);
 			} catch (IOException ioe) { /* this is never gonna happen with a StringReader, but Java don't know */ }
@@ -281,6 +281,10 @@ public class BinoBankParserServlet extends BinoBankAppServlet implements Taxonom
 						firstPossibleRankIndex = 0;
 						continue;
 					}
+					
+					//	abbreviation dot
+					if (".".equals(taxNameAnnot.valueAt(t)))
+						continue;
 					
 					//	try and match ranks
 					Rank matchedRank = null;
@@ -349,12 +353,13 @@ public class BinoBankParserServlet extends BinoBankAppServlet implements Taxonom
 			
 			//	update status
 			this.setPercentFinished(90);
-			this.setStatus("Parsing finished.");
+			this.setStatus("Parsing finished, checking parse ...");
+			System.out.println("Parsing finished, checking parse ...");
 			
 			//	verify order of ranks
 			Annotation[] epithets = taxNameAnnot.getAnnotations();
 			int lastRankSignificance = -1;
-			boolean gotAuthority = true;
+			boolean gotAuthority = false;
 			for (int e = 0; e < epithets.length; e++) {
 				Rank rank = ((Rank) ranksByName.get(epithets[e].getType()));
 				
@@ -413,18 +418,46 @@ public class BinoBankParserServlet extends BinoBankAppServlet implements Taxonom
 				}
 			}
 			
+			//	set attributes
+			for (int e = 0; e < epithets.length; e++) {
+				Rank rank = ((Rank) ranksByName.get(epithets[e].getType()));
+				
+				if (rank == null) {
+					if (AUTHORITY_NAME_ATTRIBUTE.equals(epithets[e].getType()) || AUTHORITY_YEAR_ATTRIBUTE.equals(epithets[e].getType()))
+						taxNameAnnot.setAttribute(epithets[e].getType(), epithets[e].getValue());
+					continue;
+				}
+				
+				//	we already have an epithet of this rank (can happen in a hybrid name consisting of two binomials in botanical literature)
+				if (taxNameAnnot.hasAttribute(rank.name)) {
+					taxNameAnnot.setAttribute((rank.name + "1"), taxNameAnnot.getAttribute(rank.name));
+					taxNameAnnot.setAttribute((rank.name + "2"), epithets[e].getValue());
+				}
+				
+				//	set attribute regularly
+				else taxNameAnnot.setAttribute(rank.name, epithets[e].getValue());
+			}
+			
+			//	update status
+			this.setPercentFinished(95);
+			this.setStatus("Parse OK, storing it ...");
+			System.out.println("Parse OK, storing it ...");
+			
 			//	generate DwC
 			TaxonomicName taxName = TaxonomicNameUtils.genericXmlToTaxonomicName(taxNameAnnot, rankSystem);
+			System.out.println("Normalized name string is " + taxName);
 			String nameParsed = taxName.toDwcXml();
 			if (nameParsed == null)
 				throw new RuntimeException("Incomplete Parse");
+			System.out.println("Parsed name string is " + nameParsed);
 			
-			//	store reference back to BinoBank
+			//	store name back to BinoBank
 			getBinoBankClient().updateString(this.name.getStringPlain(), nameParsed, this.userName);
+			System.out.println("Name stored");
 			
 			//	update status
 			this.setPercentFinished(100);
-			this.setStatus("Parsed reference stored.");
+			this.setStatus("Parsed taxonomic name stored.");
 		}
 		public boolean doImmediateResultForward() {
 			return true;

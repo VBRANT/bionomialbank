@@ -151,8 +151,8 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 		
 		//	add attributes
 		indexData.addIndexAttribute(HIGHER_RANK_GROUP_COLUMN_NAME, refIndexData.higher.toLowerCase());
-		indexData.addIndexAttribute(FAMILY_RANK_GROUP_COLUMN_NAME, refIndexData.genus.toLowerCase());
-		indexData.addIndexAttribute(GENUS_RANK_GROUP_COLUMN_NAME, refIndexData.family.toLowerCase());
+		indexData.addIndexAttribute(FAMILY_RANK_GROUP_COLUMN_NAME, refIndexData.family.toLowerCase());
+		indexData.addIndexAttribute(GENUS_RANK_GROUP_COLUMN_NAME, refIndexData.genus.toLowerCase());
 		indexData.addIndexAttribute(SPECIES_RANK_GROUP_COLUMN_NAME, refIndexData.species.toLowerCase());
 		indexData.addIndexAttribute(AUTHORITY_COLUMN_NAME, refIndexData.authority.toLowerCase());
 	}
@@ -224,6 +224,8 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 		
 		//	get authority
 		String authority = taxName.getAuthority();
+		if (authority == null)
+			authority = "";
 		
 		//	trim data
 		if (higher.length() > HIGHER_FAMILY_COLUMN_LENGTH)
@@ -234,7 +236,6 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 			genus.delete(GENUS_SPECIES_COLUMN_LENGTH, genus.length());
 		if (species.length() > GENUS_SPECIES_COLUMN_LENGTH)
 			species.delete(GENUS_SPECIES_COLUMN_LENGTH, species.length());
-		higher.delete(HIGHER_FAMILY_COLUMN_LENGTH, higher.length());
 		if (authority.length() > AUTHORITY_COLUMN_LENGTH)
 			authority = authority.substring(0, AUTHORITY_COLUMN_LENGTH);
 		
@@ -292,15 +293,15 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 	public PooledStringIterator findNames(String[] textPredicates, boolean disjunctive, String user, String higher, String family, String genus, String species, String authority, String rank, boolean concise) {
 		Properties detailPredicates = new Properties();
 		if (higher != null)
-			detailPredicates.setProperty(HIGHER_RANK_GROUP_COLUMN_NAME, higher);
+			detailPredicates.setProperty(HIGHER_RANK_GROUP_COLUMN_NAME, higher.toLowerCase());
 		if (family != null)
-			detailPredicates.setProperty(FAMILY_RANK_GROUP_COLUMN_NAME, family);
+			detailPredicates.setProperty(FAMILY_RANK_GROUP_COLUMN_NAME, family.toLowerCase());
 		if (genus != null)
-			detailPredicates.setProperty(GENUS_RANK_GROUP_COLUMN_NAME, genus);
+			detailPredicates.setProperty(GENUS_RANK_GROUP_COLUMN_NAME, genus.toLowerCase());
 		if (species != null)
-			detailPredicates.setProperty(SPECIES_RANK_GROUP_COLUMN_NAME, species);
+			detailPredicates.setProperty(SPECIES_RANK_GROUP_COLUMN_NAME, species.toLowerCase());
 		if (authority != null)
-			detailPredicates.setProperty(AUTHORITY_COLUMN_NAME, authority);
+			detailPredicates.setProperty(AUTHORITY_COLUMN_NAME, authority.toLowerCase());
 		return this.findStrings(textPredicates, disjunctive, rank, user, concise, detailPredicates);
 	}
 	
@@ -316,7 +317,7 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 		try {
 			nbg = getUuidGenerator();
 			UUID id = nbg.generate(string.getBytes("UTF-8"));
-			String ids = id.toString();
+			String ids = id.toString().replaceAll("\\-", "").toUpperCase();
 			return ids;
 		}
 		finally {

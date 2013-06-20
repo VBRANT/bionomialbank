@@ -131,10 +131,10 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 				if (!ps.id.equals(prevCanonicalId)) {
 					PooledStringIterator psi = bbc.getLinkedStrings(prevCanonicalId);
 					if (psi.getException() == null) {
-						ArrayList refIDs = new ArrayList();
+						ArrayList nameIDs = new ArrayList();
 						while (psi.hasNextString())
-							refIDs.add(psi.getNextString().id);
-						for (Iterator idit = refIDs.iterator(); idit.hasNext();)
+							nameIDs.add(psi.getNextString().id);
+						for (Iterator idit = nameIDs.iterator(); idit.hasNext();)
 							bbc.setCanonicalStringId(((String) idit.next()), canonicalId, user);
 					}
 				}
@@ -398,7 +398,7 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 				this.writeLine("</tr>");
 				this.writeLine("<tr class=\"resultTableRow\">");
 				this.writeLine("<td class=\"resultTableCell\">");
-				this.writeLine("<iframe src=\"about:blank\" id=\"refCodeFrame\">");
+				this.writeLine("<iframe src=\"about:blank\" id=\"nameCodeFrame\">");
 				this.writeLine("</iframe>");
 				this.writeLine("</td>");
 				this.writeLine("</tr>");
@@ -434,14 +434,14 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 				}
 				this.writeLine("<tr class=\"resultTableRow\">");
 				this.writeLine("<td class=\"resultTableCell\">");
-				this.writeLine("<span class=\"nameFormatLinkLabel\">Contribute to Bibliography:</span>");
+				this.writeLine("<span class=\"nameFormatLinkLabel\">Contribute to Taxonomic Names Index:</span>");
 				if (nameParserUrl != null) {
 					this.writeLine("<input" + 
 							" class=\"nameFormatLink\"" +
 							" type=\"button\"" +
 							" value=\"" + ((ps.getStringParsed() == null) ? "Parse Name" : "Refine Parsed Name") + "\"" +
 							" title=\"" + ((ps.getStringParsed() == null) ? "Parse this taxonomic name so formatted versions become available" : "Refine or correct the parsed version of this taxonomic name") + "\"" +
-							" onclick=\"return parseRef();\"" + 
+							" onclick=\"return parseName();\"" + 
 							" />");
 				}
 				if (nameEditorUrl != null) {
@@ -450,7 +450,7 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 							" type=\"button\"" +
 							" value=\"Edit Name\"" +
 							" title=\"" + "Correct this name string, e.g. to eliminate typos or punctuation errors" + "\"" +
-							" onclick=\"return editRef();\"" + 
+							" onclick=\"return editName();\"" + 
 							" />");
 				}
 				this.writeLine("<input type=\"button\" id=\"delete" + ps.id + "\" class=\"nameFormatLink\"" + (ps.isDeleted() ? " style=\"display: none;\"" : "") + " onclick=\"return setDeleted('" + ps.id + "', true);\" value=\"Delete\">");
@@ -502,7 +502,7 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 				this.writeLine("  return false;");
 				this.writeLine("}");
 				
-				this.writeLine("var currentFormat = '" + (EDIT_NAME_FORMAT.equals(format) ? DARWIN_CORE_FORMAT : format) + "';");
+				this.writeLine("var currentFormat = '" + ((EDIT_NAME_FORMAT.equals(format) || PARSE_NAME_FORMAT.equals(format)) ? DARWIN_CORE_FORMAT : format) + "';");
 				this.writeLine("function setFormat(format) {");
 				this.writeLine("  document.getElementById('nameCodeFrame').src = ('" + this.request.getContextPath() + this.request.getServletPath() + "?" + STRING_ID_ATTRIBUTE + "=" + id + "&" + FORMAT_PARAMETER + "=' + format);");
 				this.writeLine("  document.title = ('Parsed Name as ' + format);");
@@ -541,7 +541,7 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 							"?" + STRING_ID_ATTRIBUTE + "=" + URLEncoder.encode(ps.id, ENCODING) + "" +
 							"&resultUrl=" + URLEncoder.encode((parsedNameBaseLinkFormatted), ENCODING)
 						);
-					this.writeLine("function parseRef() {");
+					this.writeLine("function parseName() {");
 					this.writeLine("  if (!getUser())");
 					this.writeLine("    return false;");
 					this.writeLine("  document.getElementById('nameCodeFrame').src = ('" + parserLinkFormatted + "' + currentFormat + '&" + USER_PARAMETER + "=' + encodeURIComponent(user));");
@@ -721,7 +721,7 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 			
 			private void includeSearchResult() throws IOException {
 				this.writeLine("<table class=\"resultTable\">");
-				StringVector deletedRefIDs = new StringVector();
+				StringVector deletedNameIDs = new StringVector();
 				if (!psi.hasNextString()) {
 					this.writeLine("<tr class=\"resultTableRow\">");
 					this.writeLine("<td class=\"resultTableCell\">");
@@ -745,8 +745,8 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 						if ((canonicalStringId == null) && !ps.id.equals(ps.getCanonicalStringID()))
 							continue;
 						if (ps.isDeleted())
-							deletedRefIDs.addElement(ps.id);
-						this.writeLine("<tr class=\"resultTableRow\" id=\"ref" + ps.id + "\"" + ((ps.isDeleted() && (canonicalStringId == null)) ? " style=\"display: none;\"" : "") + ">");
+							deletedNameIDs.addElement(ps.id);
+						this.writeLine("<tr class=\"resultTableRow\" id=\"name" + ps.id + "\"" + ((ps.isDeleted() && (canonicalStringId == null)) ? " style=\"display: none;\"" : "") + ">");
 						this.writeLine("<td class=\"resultTableCell\" colspan=\"2\">");
 						this.writeLine("<p class=\"nameString" + (ps.id.equals(canonicalStringId) ? " representative" : "") + "\" onmouseover=\"showOptionsFor('" + ps.id + "')\">" + xmlGrammar.escape(ps.getStringPlain()) + "</p>");
 						this.writeLine("<span class=\"nameFormatLinkLabel\">");
@@ -759,7 +759,6 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 							this.writeLine("</span>");
 						}
 						this.writeLine("<div id=\"optionsFor" + ps.id + "\" class=\"resultOptions\" style=\"display: none;\">");
-//						String[] styles = BibRefUtils.getRefStringStyles();
 						if (ps.getParseChecksum() != null) {
 							this.writeLine("<span class=\"nameFormatLinkLabel\">Additional Formats &amp; Styles:</span>");
 							for (Iterator fit = formats.keySet().iterator(); fit.hasNext();) {
@@ -789,7 +788,7 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 						}
 						if (ps.getParseChecksum() != null)
 							this.writeLine("<br>");
-						this.writeLine("<span class=\"nameFormatLinkLabel\">Contribute to Bibliography:</span>");
+						this.writeLine("<span class=\"nameFormatLinkLabel\">Contribute to Taxonomic Names Index:</span>");
 						if (nameParserUrl != null) {
 							String parserLink = (this.request.getContextPath() + this.request.getServletPath() + "?" + 
 									STRING_ID_ATTRIBUTE + "=" + URLEncoder.encode(ps.id, ENCODING) + "&" +
@@ -850,9 +849,9 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 				
 				this.writeLine("<script type=\"text/javascript\">");
 				this.writeLine("function buildDeletedArray() {");
-				this.writeLine("  deletedRefIDs = new Array(" + deletedRefIDs.size() + ");");
-				for (int d = 0; d < deletedRefIDs.size(); d++)
-					this.writeLine("  deletedRefIDs[" + d + "] = '" + deletedRefIDs.get(d) + "';");
+				this.writeLine("  deletedNameIDs = new Array(" + deletedNameIDs.size() + ");");
+				for (int d = 0; d < deletedNameIDs.size(); d++)
+					this.writeLine("  deletedNameIDs[" + d + "] = '" + deletedNameIDs.get(d) + "';");
 				this.writeLine("}");
 				this.writeLine("</script>");
 				
@@ -864,38 +863,38 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 				this.writeLine("<script type=\"text/javascript\">");
 				
 				this.writeLine("var showingOptionsFor = null;");
-				this.writeLine("function showOptionsFor(refId) {");
+				this.writeLine("function showOptionsFor(nameId) {");
 				this.writeLine("  if (showingOptionsFor != null) {");
 				this.writeLine("    var showingOptions = document.getElementById('optionsFor' + showingOptionsFor);");
 				this.writeLine("    if (showingOptions != null)");
 				this.writeLine("      showingOptions.style.display = 'none';");
 				this.writeLine("    showingOptionsFor = null;");
 				this.writeLine("  }");
-				this.writeLine("  if (refId != null) {");
-				this.writeLine("    var toShowOptions = document.getElementById('optionsFor' + refId);");
+				this.writeLine("  if (nameId != null) {");
+				this.writeLine("    var toShowOptions = document.getElementById('optionsFor' + nameId);");
 				this.writeLine("    if (toShowOptions != null)");
 				this.writeLine("      toShowOptions.style.display = '';");
-				this.writeLine("    showingOptionsFor = refId;");
+				this.writeLine("    showingOptionsFor = nameId;");
 				this.writeLine("  }");
 				this.writeLine("}");
 				
-				this.writeLine("var deletedRefIDs = null;");
+				this.writeLine("var deletedNameIDs = null;");
 				this.writeLine("var showingDeleted = " + ((canonicalStringId == null) ? "false" : "true") + ";");
 				this.writeLine("function toggleDeleted(showDeleted) {");
-				this.writeLine("  if (deletedRefIDs == null)");
+				this.writeLine("  if (deletedNameIDs == null)");
 				this.writeLine("    buildDeletedArray();");
 				this.writeLine("  showingDeleted = showDeleted;");
-				this.writeLine("  for (var d = 0; d < deletedRefIDs.length; d++) {");
-				this.writeLine("    var deletedRef = document.getElementById('ref' + deletedRefIDs[d]);");
-				this.writeLine("    if (deletedRef != null)");
-				this.writeLine("      deletedRef.style.display = (showDeleted ? '' : 'none');");
+				this.writeLine("  for (var d = 0; d < deletedNameIDs.length; d++) {");
+				this.writeLine("    var deletedName = document.getElementById('name' + deletedNameIDs[d]);");
+				this.writeLine("    if (deletedName != null)");
+				this.writeLine("      deletedName.style.display = (showDeleted ? '' : 'none');");
 				this.writeLine("  }");
 				this.writeLine("  document.getElementById('showDeleted').style.display = (showDeleted ? 'none' : '');");
 				this.writeLine("  document.getElementById('hideDeleted').style.display = (showDeleted ? '' : 'none');");
 				this.writeLine("  return false;");
 				this.writeLine("}");
 				
-				this.writeLine("function setDeleted(refId, deleted) {");
+				this.writeLine("function setDeleted(nameId, deleted) {");
 				this.writeLine("  if (!getUser())");
 				this.writeLine("    return false;");
 				this.writeLine("  var minorUpdateFrame = document.getElementById('minorUpdateFrame');");
@@ -904,10 +903,10 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 				this.writeLine("  var minorUpdateForm = minorUpdateFrame.contentWindow.document.getElementById('minorUpdateForm');");
 				this.writeLine("  if (minorUpdateForm == null)");
 				this.writeLine("    return false;");
-				this.writeLine("  var refIdField = minorUpdateFrame.contentWindow.document.getElementById('" + STRING_ID_ATTRIBUTE + "');");
-				this.writeLine("  if (refIdField == null)");
+				this.writeLine("  var nameIdField = minorUpdateFrame.contentWindow.document.getElementById('" + STRING_ID_ATTRIBUTE + "');");
+				this.writeLine("  if (nameIdField == null)");
 				this.writeLine("    return false;");
-				this.writeLine("  refIdField.value = refId;");
+				this.writeLine("  nameIdField.value = nameId;");
 				this.writeLine("  var deletedField = minorUpdateFrame.contentWindow.document.getElementById('" + DELETED_PARAMETER + "');");
 				this.writeLine("  if (deletedField == null)");
 				this.writeLine("    return false;");
@@ -916,31 +915,31 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 				this.writeLine("  if (userField == null)");
 				this.writeLine("    return false;");
 				this.writeLine("  userField.value = user;");
-				this.writeLine("  if (deletedRefIDs == null)");
+				this.writeLine("  if (deletedNameIDs == null)");
 				this.writeLine("    buildDeletedArray();");
 				this.writeLine("  minorUpdateForm.submit();");
-				this.writeLine("  document.getElementById('delete' + refId).style.display = (deleted ? 'none' : '');");
-				this.writeLine("  document.getElementById('unDelete' + refId).style.display = (deleted ? '' : 'none');");
+				this.writeLine("  document.getElementById('delete' + nameId).style.display = (deleted ? 'none' : '');");
+				this.writeLine("  document.getElementById('unDelete' + nameId).style.display = (deleted ? '' : 'none');");
 				this.writeLine("  if (!showingDeleted && deleted)");
-				this.writeLine("    document.getElementById('ref' + refId).style.display = 'none';");
+				this.writeLine("    document.getElementById('name' + nameId).style.display = 'none';");
 				this.writeLine("  if (deleted)");
-				this.writeLine("    deletedRefIDs[deletedRefIDs.length] = refId;");
+				this.writeLine("    deletedNameIDs[deletedNameIDs.length] = nameId;");
 				this.writeLine("  else {");
-				this.writeLine("    for (var d = 0; d < deletedRefIDs.length; d++) {");
-				this.writeLine("      if (deletedRefIDs[d] == refId) {");
-				this.writeLine("        deletedRefIDs[d] = '';");
-				this.writeLine("        d = deletedRefIDs.length;");
+				this.writeLine("    for (var d = 0; d < deletedNameIDs.length; d++) {");
+				this.writeLine("      if (deletedNameIDs[d] == nameId) {");
+				this.writeLine("        deletedNameIDs[d] = '';");
+				this.writeLine("        d = deletedNameIDs.length;");
 				this.writeLine("      }");
 				this.writeLine("    }");
 				this.writeLine("  }");
 				this.writeLine("  return false;");
 				this.writeLine("}");
 				
-				this.writeLine("function showVersions(canRefId) {");
-				this.writeLine("  window.location.href = ('" + this.request.getContextPath() + this.request.getServletPath() + "?" + CANONICAL_STRING_ID_ATTRIBUTE + "=' + canRefId);");
+				this.writeLine("function showVersions(canNameId) {");
+				this.writeLine("  window.location.href = ('" + this.request.getContextPath() + this.request.getServletPath() + "?" + CANONICAL_STRING_ID_ATTRIBUTE + "=' + canNameId);");
 				this.writeLine("}");
 				
-				this.writeLine("function makeRepresentative(canRefId) {");
+				this.writeLine("function makeRepresentative(canNameId) {");
 				this.writeLine("  if (!getUser())");
 				this.writeLine("    return false;");
 				this.writeLine("  var minorUpdateFrame = document.getElementById('minorUpdateFrame');");
@@ -949,16 +948,16 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 				this.writeLine("  var minorUpdateForm = minorUpdateFrame.contentWindow.document.getElementById('minorUpdateForm');");
 				this.writeLine("  if (minorUpdateForm == null)");
 				this.writeLine("    return false;");
-				this.writeLine("  var canRefIdField = minorUpdateFrame.contentWindow.document.getElementById('" + CANONICAL_STRING_ID_ATTRIBUTE + "');");
-				this.writeLine("  if (canRefIdField == null)");
+				this.writeLine("  var canNameIdField = minorUpdateFrame.contentWindow.document.getElementById('" + CANONICAL_STRING_ID_ATTRIBUTE + "');");
+				this.writeLine("  if (canNameIdField == null)");
 				this.writeLine("    return false;");
-				this.writeLine("  canRefIdField.value = canRefId;");
+				this.writeLine("  canNameIdField.value = canNameId;");
 				this.writeLine("  var userField = minorUpdateFrame.contentWindow.document.getElementById('" + USER_PARAMETER + "');");
 				this.writeLine("  if (userField == null)");
 				this.writeLine("    return false;");
 				this.writeLine("  userField.value = user;");
 				this.writeLine("  minorUpdateForm.submit();");
-				this.writeLine("  refreshVersionsId = canRefId;");
+				this.writeLine("  refreshVersionsId = canNameId;");
 				this.writeLine("  window.setTimeout('refreshVersions()', 250);");
 				this.writeLine("  return false;");
 				this.writeLine("}");
@@ -976,12 +975,12 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 				this.writeLine("    window.setTimeout('refreshVersions()', 250);");
 				this.writeLine("    return false;");
 				this.writeLine("  }");
-				this.writeLine("  var canRefIdField = minorUpdateFrame.contentWindow.document.getElementById('" + CANONICAL_STRING_ID_ATTRIBUTE + "');");
-				this.writeLine("  if (canRefIdField == null) {");
+				this.writeLine("  var canNameIdField = minorUpdateFrame.contentWindow.document.getElementById('" + CANONICAL_STRING_ID_ATTRIBUTE + "');");
+				this.writeLine("  if (canNameIdField == null) {");
 				this.writeLine("    window.setTimeout('refreshVersions()', 250);");
 				this.writeLine("    return false;");
 				this.writeLine("  }");
-				this.writeLine("  if (canRefIdField.value != '') {");
+				this.writeLine("  if (canNameIdField.value != '') {");
 				this.writeLine("    window.setTimeout('refreshVersions()', 250);");
 				this.writeLine("    return false;");
 				this.writeLine("  }");

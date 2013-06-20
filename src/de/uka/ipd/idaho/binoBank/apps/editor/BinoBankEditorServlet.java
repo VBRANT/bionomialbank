@@ -85,10 +85,10 @@ public class BinoBankEditorServlet extends BinoBankAppServlet {
 		HtmlPageBuilder pageBuilder = new HtmlPageBuilder(this, request, response) {
 			protected void include(String type, String tag) throws IOException {
 				if ("includeBody".equals(type))
-					this.includeParsedReference();
+					this.includeParsedName();
 				else super.include(type, tag);
 			}
-			private void includeParsedReference() throws IOException {
+			private void includeParsedName() throws IOException {
 				this.writeLine("<form id=\"nameEditorForm\" method=\"POST\" action=\"" + this.request.getContextPath() + this.request.getServletPath() + "\" accept-charset=\"utf8\" encrypt=\"application/x-www-form-urlencoded; charset=utf8\">");
 				this.writeLine("<table class=\"editTable\">");
 				
@@ -121,7 +121,7 @@ public class BinoBankEditorServlet extends BinoBankAppServlet {
 			}
 			
 			protected String getPageTitle(String title) {
-				return "Edit Reference";
+				return "Edit Taxonomic Name";
 			}
 		};
 		this.sendPopupHtmlPage(pageBuilder);
@@ -135,7 +135,7 @@ public class BinoBankEditorServlet extends BinoBankAppServlet {
 		//	use form data receiver to take control of character encoding
 		FormDataReceiver data = FormDataReceiver.receive(request, Integer.MAX_VALUE, null, -1, new HashSet(1));
 		
-		//	get source reference ID
+		//	get source name ID
 		String sourceNameId = data.getFieldValue("sourceNameId");
 		if (sourceNameId == null) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid source name ID");
@@ -156,9 +156,9 @@ public class BinoBankEditorServlet extends BinoBankAppServlet {
 			return;
 		}
 		
-		//	get edited reference
-		String refString = new String(data.getFieldByteValue("nameString"), ENCODING);
-		if (refString == null) {
+		//	get edited taxonomic name
+		String nameString = new String(data.getFieldByteValue("nameString"), ENCODING);
+		if (nameString == null) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid name string");
 			return;
 		}
@@ -175,7 +175,7 @@ public class BinoBankEditorServlet extends BinoBankAppServlet {
 		
 		//	verify edited name against source name
 		String srNoSpace = sourceName.getStringPlain().replaceAll("\\s+", "");
-		String erNoSpace = refString.replaceAll("\\s+", "");
+		String erNoSpace = nameString.replaceAll("\\s+", "");
 		int avgLength = ((srNoSpace.length() + erNoSpace.length()) / 2);
 		int estEditDist = StringUtils.estimateLevenshteinDistance(srNoSpace, erNoSpace);
 		if ((estEditDist * 5) > avgLength) {
@@ -189,8 +189,8 @@ public class BinoBankEditorServlet extends BinoBankAppServlet {
 		}
 		
 		//	store edited name
-		PooledString name = bbk.updateString(refString, user);
-		refString = name.getStringPlain();
+		PooledString name = bbk.updateString(nameString, user);
+		nameString = name.getStringPlain();
 		
 		//	add parse to edited name if source name has one
 		if ((sourceName.getStringParsed() != null) && (name.getParseChecksum() == null)) try {
@@ -199,37 +199,37 @@ public class BinoBankEditorServlet extends BinoBankAppServlet {
 			MutableAnnotation sourceNameString = Gamta.newDocument(Gamta.newTokenSequence(sourceName.getStringPlain(), sourceNameParsed.getTokenizer()));
 			if (annotateDetails(sourceNameParsed, sourceNameString)) {
 				
-				//	char-wise Levenshtein transform source into edited reference
-				int[] editSequence = StringUtils.getLevenshteinEditSequence(sourceName.getStringPlain(), refString);
-				int sourceRefOffset = 0;
-				int refOffset = 0;
+				//	char-wise Levenshtein transform source into edited name
+				int[] editSequence = StringUtils.getLevenshteinEditSequence(sourceName.getStringPlain(), nameString);
+				int sourceNameOffset = 0;
+				int nameOffset = 0;
 				for (int e = 0; e < editSequence.length; e++) {
 					if (editSequence[e] == StringUtils.LEVENSHTEIN_KEEP) {
-						sourceRefOffset++;
-						refOffset++;
+						sourceNameOffset++;
+						nameOffset++;
 					}
 					else if (editSequence[e] == StringUtils.LEVENSHTEIN_INSERT) {
-						sourceNameString.insertChar(refString.charAt(refOffset), sourceRefOffset);
-						sourceRefOffset++;
-						refOffset++;
+						sourceNameString.insertChar(nameString.charAt(nameOffset), sourceNameOffset);
+						sourceNameOffset++;
+						nameOffset++;
 					}
 					else if (editSequence[e] == StringUtils.LEVENSHTEIN_DELETE) {
-						sourceNameString.removeChar(sourceRefOffset);
+						sourceNameString.removeChar(sourceNameOffset);
 					}
 					else if (editSequence[e] == StringUtils.LEVENSHTEIN_REPLACE) {
-						sourceNameString.setChar(refString.charAt(refOffset), sourceRefOffset);
-						sourceRefOffset++;
-						refOffset++;
+						sourceNameString.setChar(nameString.charAt(nameOffset), sourceNameOffset);
+						sourceNameOffset++;
+						nameOffset++;
 					}
 				}
 				
 				//	generate DwC from transformation result ==> parse for edited name
 				String nameParsed = TaxonomicNameUtils.toSimpleDwcXml(TaxonomicNameUtils.dwcXmlToTaxonomicName(sourceNameString));
-				bbk.updateString(refString, nameParsed, user);
+				bbk.updateString(nameString, nameParsed, user);
 			}
 		}
 		catch (Exception e) {
-			System.out.println("Error transforming parsed reference: " + e.getMessage());
+			System.out.println("Error transforming parsed taxonomic name: " + e.getMessage());
 			e.printStackTrace(System.out);
 		}
 		
