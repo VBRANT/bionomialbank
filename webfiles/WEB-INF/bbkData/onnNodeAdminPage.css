@@ -12,7 +12,7 @@ a {
 }
 
 a:hover {
-    background: aliceblue;
+    background: khaki;
     color: navy;
     opacity: 0.7;
 }
@@ -104,7 +104,7 @@ img {
 }
 
 .messageTable {
-	background-color: silver;
+	background-color: lightgoldenrodyellow;
     color: navy;
     -moz-border-radius: 0.5em;
     -webkit-border-radius: 0.5em;
@@ -115,7 +115,7 @@ img {
 }
 
 .messageTableHead {
-	background: aliceblue;
+	background: khaki;
 	color: navy;
 }
 
@@ -132,7 +132,7 @@ img {
 }
 
 .nodesTable {
-	background-color: silver;
+	background-color: lightgoldenrodyellow;
     color: navy;
     text-align: center;
     -moz-border-radius: 0.5em;
@@ -144,7 +144,7 @@ img {
 }
 
 .nodesTableHead {
-	background-color: aliceblue;
+	background-color: khaki;
 	color: navy;
 }
 
