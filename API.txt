@@ -37,6 +37,11 @@ BinoBank data servlet (/BinoBank/bbk):
               <name ... />
             </nameSet>
 
+        action=rss: retrieve an RSS feed announcing recently added names, ordered by decreasing upload time
+            additional parameters:
+                top: number of names to include in the feed (defaults to 100 if not specified)
+            response: an RSS feed announcing the latest additions (MIME type application/rss+xml, encoding UTF-8)
+
         action=get: resolve BinoBank internal identifiers
             additional parameters:
                 id: the identifier(s) to resolve, can be multi-valued
