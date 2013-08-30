@@ -69,6 +69,7 @@ BinoBank data servlet (/BinoBank/bbk):
                 authority: query against name authority, only finds names with parsed version available
                 format=concise: exclude parsed verion of names from response
                 format: the name of the format for representing the parsed verion of the names (defaults to the native MODS XML if not specified)
+                limit: the maximum number of names to include in the search result (0, the default, means no limit)
             response: the names matching the specified search criteria (MIME type text/xml, encoding UTF-8)
 
             <nameSet>

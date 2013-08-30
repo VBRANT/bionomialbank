@@ -74,16 +74,16 @@ public class BinoBankRestClient extends StringPoolRestClient implements BinoBank
 	}
 	
 	/* (non-Javadoc)
-	 * @see de.uka.ipd.idaho.binoBank.BinoBankClient#findNames(java.lang.String[], boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)
+	 * @see de.uka.ipd.idaho.binoBank.BinoBankClient#findNames(java.lang.String[], boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, int)
 	 */
-	public PooledStringIterator findNames(String[] textPredicates, boolean disjunctive, String user, String higher, String family, String genus, String species, String authority, String rank) {
-		return this.findNames(textPredicates, disjunctive, user, higher, family, genus, species, authority, rank, false);
+	public PooledStringIterator findNames(String[] textPredicates, boolean disjunctive, String user, String higher, String family, String genus, String species, String authority, String rank, int limit) {
+		return this.findNames(textPredicates, disjunctive, user, higher, family, genus, species, authority, rank, false, limit);
 	}
-
+	
 	/* (non-Javadoc)
-	 * @see de.uka.ipd.idaho.binoBank.BinoBankClient#findNames(java.lang.String[], boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, boolean)
+	 * @see de.uka.ipd.idaho.binoBank.BinoBankClient#findNames(java.lang.String[], boolean, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, boolean, int)
 	 */
-	public PooledStringIterator findNames(String[] textPredicates, boolean disjunctive, String user, String higher, String family, String genus, String species, String authority, String rank, boolean concise) {
+	public PooledStringIterator findNames(String[] textPredicates, boolean disjunctive, String user, String higher, String family, String genus, String species, String authority, String rank, boolean concise, int limit) {
 		try {
 			StringBuffer detailPredicates = new StringBuffer();
 			if (higher != null)
@@ -96,7 +96,7 @@ public class BinoBankRestClient extends StringPoolRestClient implements BinoBank
 				detailPredicates.append("&" + SPECIES_RANK_GROUP_PARAMETER + "=" + URLEncoder.encode(species, ENCODING));
 			if (authority != null)
 				detailPredicates.append("&" + AUTHORITY_PARAMETER + "=" + URLEncoder.encode(authority, ENCODING));
-			return this.findStrings(textPredicates, disjunctive, rank, user, concise, detailPredicates.toString());
+			return this.findStrings(textPredicates, disjunctive, rank, user, concise, limit, detailPredicates.toString());
 		}
 		catch (IOException ioe) {
 			return new ExceptionPSI(ioe);
