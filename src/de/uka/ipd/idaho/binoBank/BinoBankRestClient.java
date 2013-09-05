@@ -96,7 +96,7 @@ public class BinoBankRestClient extends StringPoolRestClient implements BinoBank
 				detailPredicates.append("&" + SPECIES_RANK_GROUP_PARAMETER + "=" + URLEncoder.encode(species, ENCODING));
 			if (authority != null)
 				detailPredicates.append("&" + AUTHORITY_PARAMETER + "=" + URLEncoder.encode(authority, ENCODING));
-			return this.findStrings(textPredicates, disjunctive, rank, user, concise, limit, detailPredicates.toString());
+			return this.findStrings(textPredicates, disjunctive, rank, user, concise, limit, false, detailPredicates.toString());
 		}
 		catch (IOException ioe) {
 			return new ExceptionPSI(ioe);

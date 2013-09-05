@@ -302,7 +302,7 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 			detailPredicates.setProperty(SPECIES_RANK_GROUP_COLUMN_NAME, species.toLowerCase());
 		if (authority != null)
 			detailPredicates.setProperty(AUTHORITY_COLUMN_NAME, authority.toLowerCase());
-		return this.findStrings(textPredicates, disjunctive, rank, user, concise, limit, detailPredicates);
+		return this.findStrings(textPredicates, disjunctive, rank, user, concise, limit, false, detailPredicates);
 	}
 	
 	/**
