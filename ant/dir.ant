@@ -35,7 +35,7 @@
 		</copy -->
 		
 		<!-- copy required libraries -->
-		<copy todir="${web.home}/WEB-INF/lib" overwrite="true" verbose="false">
+		<copy todir="${build.home}/WEB-INF/lib" overwrite="true" verbose="false">
 			<fileset dir="${lib.home}" />
 		</copy>
 		<!--copy todir="${build.home}/WEB-INF/lib">
