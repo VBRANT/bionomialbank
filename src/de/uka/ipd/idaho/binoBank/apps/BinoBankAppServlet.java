@@ -18,6 +18,7 @@
 package de.uka.ipd.idaho.binoBank.apps;
 
 import javax.servlet.Servlet;
+import javax.servlet.ServletException;
 
 import de.uka.ipd.idaho.binoBank.BinoBankClient;
 import de.uka.ipd.idaho.binoBank.BinoBankRestClient;
@@ -31,6 +32,14 @@ import de.uka.ipd.idaho.onn.stringPool.apps.StringPoolAppServlet;
  * @author sautter
  */
 public class BinoBankAppServlet extends StringPoolAppServlet {
+	
+	/* (non-Javadoc)
+	 * @see de.uka.ipd.idaho.onn.stringPool.apps.StringPoolAppServlet#reInit()
+	 */
+	protected void reInit() throws ServletException {
+		super.reInit();
+		this.bbc = null;
+	}
 	
 	/**
 	 * Retrieve a client object to communicate with the backing BinoBank node.

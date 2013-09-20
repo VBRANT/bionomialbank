@@ -157,11 +157,12 @@ public class BinoBankEditorServlet extends BinoBankAppServlet {
 		}
 		
 		//	get edited taxonomic name
-		String nameString = new String(data.getFieldByteValue("nameString"), ENCODING);
-		if (nameString == null) {
+		byte[] nameStringBytes = data.getFieldByteValue("nameString");
+		if (nameStringBytes == null) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid name string");
 			return;
 		}
+		String nameString = new String(nameStringBytes, ENCODING);
 		
 		//	connect to BinoBank
 		BinoBankClient bbk = this.getBinoBankClient();
@@ -252,7 +253,7 @@ public class BinoBankEditorServlet extends BinoBankAppServlet {
 		Annotation[] details = sourceNameParsed.getAnnotations();
 		boolean gotAllDetails = true;
 		
-		//	annotate all occurences of all details
+		//	annotate all occurrences of all details
 		StringVector detailList = new StringVector(true);
 		for (int d = 0; d < details.length; d++) {
 			if (details[d].size() == sourceNameParsed.size())
@@ -287,9 +288,5 @@ public class BinoBankEditorServlet extends BinoBankAppServlet {
 		
 		//	did we assign everything? (this should work in the very most cases)
 		return gotAllDetails;
-		
-		//	TODO use greedy overlay technique to deal with details that have equal values, etc
-		//		 - use same technique as for generating structures
-		//		 - select first to cover all
 	}
 }

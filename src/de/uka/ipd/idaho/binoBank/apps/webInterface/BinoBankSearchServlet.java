@@ -100,12 +100,19 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 			} catch (IOException ioe) {}
 		}
 		
+		//	get generic rank system (we'll be handling names from all domains)
+		this.rankSystem = TaxonomicRankSystem.getRankSystem(null);
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.uka.ipd.idaho.binoBank.apps.BinoBankAppServlet#reInit()
+	 */
+	protected void reInit() throws ServletException {
+		super.reInit();
+		
 		//	get links to name string editor and parser
 		this.nameParserUrl = this.getSetting("nameParserUrl");
 		this.nameEditorUrl = this.getSetting("nameEditorUrl");
-		
-		//	get generic rank system (we'll be handling names from all domains)
-		this.rankSystem = TaxonomicRankSystem.getRankSystem(null);
 	}
 	
 	/* (non-Javadoc)
@@ -961,7 +968,6 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 				this.writeLine("  window.setTimeout('refreshVersions()', 250);");
 				this.writeLine("  return false;");
 				this.writeLine("}");
-				//	TODO consider using layover DIV to block page
 				
 				this.writeLine("var refreshVersionsId = '';");
 				this.writeLine("function refreshVersions() {");
