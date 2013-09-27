@@ -8,5 +8,8 @@ domainName = "<yourBinoBankDomainName>";
 //accessUrl = "http://plazi2.cs.umb.edu:8080/BinoBank/bbk";
 //adminPasscode = "<noneOfYourBusiness>";
 
+// HTML template file required for admin page
+basePage = "onnNodeAdminPage.html";
+
 // Stylesheet file required for admin page
 cssNames = "onnNodeAdminPage.css";
