@@ -729,6 +729,7 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 			private void includeSearchResult() throws IOException {
 				this.writeLine("<table class=\"resultTable\">");
 				StringVector deletedNameIDs = new StringVector();
+				int nameCount = 0;
 				if (!psi.hasNextString()) {
 					this.writeLine("<tr class=\"resultTableRow\">");
 					this.writeLine("<td class=\"resultTableCell\">");
@@ -739,7 +740,10 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 				else {
 					this.writeLine("<tr class=\"resultTableRow\">");
 					this.writeLine("<td class=\"resultTableCell\" width=\"20%\">");
-					this.writeLine("<p class=\"nameString\" style=\"font-size: 60%;\">Hover&nbsp;names&nbsp;for&nbsp;further&nbsp;options</p>");
+					this.writeLine("<span class=\"nameString\" style=\"font-size: 60%;\">Hover&nbsp;names&nbsp;for&nbsp;further&nbsp;options</span>" +
+							"&nbsp;&nbsp;" +
+							"<span class=\"nameString\" style=\"font-size: 60%;\"><span id=\"resultNameCount\"></span>&nbsp;matching&nbsp;names&nbsp;(including&nbsp;<span id=\"resultNameCountDeleted\"></span>&nbsp;deleted)&nbsp;out&nbsp;of&nbsp;" + getBinoBankClient().getStringCount(0) + "</span>" +
+							"");
 					this.writeLine("</td>");
 					this.writeLine("<td class=\"resultTableCell\" style=\"text-align: right;\">");
 					this.writeLine("<input type=\"button\" id=\"showDeleted\" class=\"nameFormatLink\" onclick=\"return toggleDeleted(true);\" value=\"Show names flagged as deleted\" />");
@@ -753,6 +757,7 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 							continue;
 						if (ps.isDeleted())
 							deletedNameIDs.addElement(ps.id);
+						nameCount++;
 						this.writeLine("<tr class=\"resultTableRow\" id=\"name" + ps.id + "\"" + ((ps.isDeleted() && (canonicalStringId == null)) ? " style=\"display: none;\"" : "") + ">");
 						this.writeLine("<td class=\"resultTableCell\" colspan=\"2\">");
 						this.writeLine("<p class=\"nameString" + (ps.id.equals(canonicalStringId) ? " representative" : "") + "\" onmouseover=\"showOptionsFor('" + ps.id + "')\">" + xmlGrammar.escape(ps.getStringPlain()) + "</p>");
@@ -860,6 +865,12 @@ public class BinoBankSearchServlet extends BinoBankWiServlet implements BinoBank
 				for (int d = 0; d < deletedNameIDs.size(); d++)
 					this.writeLine("  deletedNameIDs[" + d + "] = '" + deletedNameIDs.get(d) + "';");
 				this.writeLine("}");
+				this.writeLine("var rcSpan = getById('resultNameCount');");
+				this.writeLine("if (rcSpan != null)");
+				this.writeLine("  rcSpan.appendChild(document.createTextNode('" + nameCount + "'));");
+				this.writeLine("var rcDelSpan = getById('resultNameCountDeleted');");
+				this.writeLine("if (rcDelSpan != null)");
+				this.writeLine("  rcDelSpan.appendChild(document.createTextNode('" + deletedNameIDs.size() + "'));");
 				this.writeLine("</script>");
 				
 				this.write("<iframe id=\"minorUpdateFrame\" height=\"0px\" style=\"border-width: 0px;\" src=\"" + this.request.getContextPath() + this.request.getServletPath() + "?" + STRING_ID_ATTRIBUTE + "=" + MINOR_UPDATE_FORM_NAME_ID + "\">");

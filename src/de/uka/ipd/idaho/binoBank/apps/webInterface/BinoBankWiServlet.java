@@ -30,6 +30,8 @@ public class BinoBankWiServlet extends BinoBankAppServlet {
 	}
 	
 	public void writePageHeadExtensions(HtmlPageBuilder out) throws IOException {
+		HtmlPageBuilder.writeJavaScriptDomHelpers(out);
+		
 		out.writeLine("<script type=\"text/javascript\">");
 		
 		out.writeLine("var user = '';");
