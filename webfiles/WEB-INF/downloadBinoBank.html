@@ -46,7 +46,7 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
 </ul></li>
 <li>Adjust the <code>config.cnfg</code> files in the <code>WEB-INF/&lt;xyz&gt;Data</code> folders:<ul>
 	<li>In the config file in <code>WEB-INF/bbkData/</code>, enter a (presumably) globally unique BinoBank domain name, which should identify the institution the BinoBank node runs in and, if the institution runs multiple BinoBank nodes, also distingish the node being set up from the other ones already running</li>
-	<li>In the same file, enter the prefered access URL for the node, i.e., the (prefered) URL for accessing the node from the WWW</li>
+	<li>In the same file, enter the preferred access URL for the node, i.e., the (preferred) URL for accessing the node from the WWW</li>
 	<li>In the same file, enter the administration passcode for the BinoBank node being set up</li>
 	<li>To secure form based taxonomic name upload with ReCAPTCHA to avoid spamming, obtain a ReCAPTCHA API key pair and put it in the config file in the <code>WEB-INF/uploadData/</code> folder</li>
 	<li>To secure script based taxonomic name upload with an access key to avoid spamming, specify a n access key in the config file in the <code>WEB-INF/uploadData/</code> folder</li>
@@ -57,7 +57,7 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
 	(by default configured to use Apache Derby in embedded mode)</li>
 	<li>Set the <code>stringPoolNodeName</code> setting to the name assigned to the BinoBank servlet in the web.xml (which is <code>BinoBank</code> if you did not change it) so dependent local servlets can connect to it directly (Java method invocations) instead of the local network loopback adapter for better performance<br/>
 	(if you do not change the <code>web.xml</code> file, you need not change this setting, either)</li>
-	<li>Set the <code>stringPoolNodeUrl</code> setting to the access URL you configured above, or to a <code>localhost</code> URL; in any case, the URL used should point to the BinoBank servlet directly for better performance, even if the prefered external access URL is one proxied through a local Apache web server or the like<br/>
+	<li>Set the <code>stringPoolNodeUrl</code> setting to the access URL you configured above, or to a <code>localhost</code> URL; in any case, the URL used should point to the BinoBank servlet directly for better performance, even if the preferred external access URL is one proxied through a local Apache web server or the like<br/>
 	(the default setting assumes Tomcat running on port 8080, you need to change this only if your Tomcat is running on a different port)</li>
 </ul></li>
 </ul></li>
@@ -107,7 +107,7 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
 	<li>This can be as simple customizing respective CSS styles (can be tested on statically saved post-generation HTML pages)</li>
 	<li>This can include adding new <code>&lt;includeFile .../&gt;</code> tags; when doing this, make sure that the taxonomic names files exist (requires the web application to run for testing)</li>
 </ul></li>
-<li>Do not add header, navigation, or footer content to the <code>binoBank.html</code> or <code>binoBankPopup.html</code> files directly, but use the respective inserted files insted (requires the web application to run for testing)</li>
+<li>Do not add header, navigation, or footer content to the <code>binoBank.html</code> or <code>binoBankPopup.html</code> files directly, but use the respective inserted files instead (requires the web application to run for testing)</li>
 </ul></p>
 <h3>THE BinoBank NODE API</h3>
 <p>BinoBank data servlet (<code>/BinoBank/bbk</code>):<ul>
@@ -117,7 +117,7 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
     <li>additional parameters: none</li>
     <li>response (MIME type <code>text/xml</code>, encoding <code>UTF-8</code>):
       <code><pre>&lt;nodes&gt;
-  &lt;node name=&quot;<i>name of BinoBank node</i>&quot; accessUrl=&quot;<i>prefered access URL of node</i>&quot; /&gt;
+  &lt;node name=&quot;<i>name of BinoBank node</i>&quot; accessUrl=&quot;<i>preferred access URL of node</i>&quot; /&gt;
   &lt;node ... /&gt;
 &lt;/nodes&gt;</code></pre></li></ul></li>
   <li><code>action=ping</code> (also as <code>/binoBank/bbk/ping</code>): ping node<ul>
@@ -128,7 +128,7 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
     <li>additional parameters: none</li>
     <li>response (MIME type <code>text/xml</code>, encoding <code>UTF-8</code>):
       <code><pre>&lt;nodes&gt;
-  &lt;node name=&qout;&lt;name of BinoBank node&gt;&qout; accessUrl=&quot;<i>prefered access URL of node</i>&quot; /&gt;
+  &lt;node name=&qout;&lt;name of BinoBank node&gt;&qout; accessUrl=&quot;<i>preferred access URL of node</i>&quot; /&gt;
 &lt;/nodes&gt;</pre></code></li></ul></li>
   <li><code>action=feed</code>: retrieve the taxonomic name update feed, ordered by increasing update time<ul>
     <li>additional parameters:<ul>
@@ -142,7 +142,7 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
     <li>additional parameters:<ul>
       <li>id: the identifier(s) to resolve, can be multi-valued</li>
       <li>format: the format to represent the parsed versions of taxonomic names in (optional, defaults to the native DarwinCore + DarwinCore-Additional-Ranks XML representation if omitted)</li></ul></li>
-    <li>response: the taxonomic name(s) with the speciefied identifier(s) (MIME type <code>text/xml</code>, encoding <code>UTF-8</code>)
+    <li>response: the taxonomic name(s) with the specified identifier(s) (MIME type <code>text/xml</code>, encoding <code>UTF-8</code>)
       <code><pre>&lt;refSet&gt;
   &lt;ref id=&quot;<i>taxonomic name ID</i>&quot; canonicalId=&quot;<i>ID of canonical taxonomic name to set</i>&quot; deleted=&quot;<i>deleted flag, true or false</i>&quot; createTime=&quot;<i>UTC timestamp taxonomic name was first added to BinoBank</i>&quot; createUser=&quot;<i>name of the user to first add taxonomic name to BinoBank</i>&quot; createDomain=&quot;<i>name of BinoBank node taxonomic name was first added to</i>&quot; updateTime=&quot;<i>UTC timestamp taxonomic name was last updated</i>&quot; updateUser=&quot;<i>name of the user to last update taxonomic name</i>&quot; updateDomain=&quot;<i>name of BinoBank node taxonomic name was last updated at</i>&quot;&gt;
     &lt;refString&gt;&lt;plain taxonomic name string&gt;&lt;/refString&gt;
@@ -191,7 +191,7 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
     <li>request body: none</li>
     <li>response (MIME type <code>text/xml</code>, encoding <code>UTF-8</code>):
       <code><pre>&lt;nodes&gt;
-  &lt;node name=&quot;<i>name of BinoBank node</i>&quot; accessUrl=&quot;<i>prefered access URL of node</i>&quot; /&gt;
+  &lt;node name=&quot;<i>name of BinoBank node</i>&quot; accessUrl=&quot;<i>preferred access URL of node</i>&quot; /&gt;
   &lt;node ... /&gt;
 &lt;/nodes&gt;</pre></code></li></ul></li>
   <li><code>/binoBank/bbk/ping</code>: ping node<ul>
@@ -202,15 +202,15 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
     <li>request body: none</li>
     <li>response (MIME type <code>text/xml</code>, encoding <code>UTF-8</code>):
       <code><pre>&lt;nodes&gt;
-  &lt;node name=&quot;<i>name of BinoBank node</i>&quot; accessUrl=&quot;<i>prefered access URL of node</i>&quot; /&gt;
+  &lt;node name=&quot;<i>name of BinoBank node</i>&quot; accessUrl=&quot;<i>preferred access URL of node</i>&quot; /&gt;
 &lt;/nodes&gt;</pre></code></li></ul></li>
   <li><code>/binoBank/bbk/introduce</code>: introduce a new BinoBank node to this one, retrieve list of other known BinoBank nodes<ul>
     <li>request body (parameters):<ul>
       <li><code>name</code>: the name of the BinoBank node introducing itself</li>
-      <li><code>accessUrl</code>: the prefered access URL of the BinoBank node introducing itself</li></ul></li>
+      <li><code>accessUrl</code>: the preferred access URL of the BinoBank node introducing itself</li></ul></li>
     <li>response (MIME type <code>text/xml</code>, encoding <code>UTF-8</code>):
       <code><pre>&lt;nodes&gt;
-  &lt;node name=&quot;<i>name of BinoBank node</i>&quot; accessUrl=&quot;<i>prefered access URL of node</i>&quot; /&gt;
+  &lt;node name=&quot;<i>name of BinoBank node</i>&quot; accessUrl=&quot;<i>preferred access URL of node</i>&quot; /&gt;
   &lt;node ... /&gt;
 &lt;/nodes&gt;</pre></code></li></ul></li>
 </ul></li>
