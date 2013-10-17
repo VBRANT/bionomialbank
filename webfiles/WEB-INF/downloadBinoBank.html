@@ -51,7 +51,7 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
 	<li>To secure form based taxonomic name upload with ReCAPTCHA to avoid spamming, obtain a ReCAPTCHA API key pair and put it in the config file in the <code>WEB-INF/uploadData/</code> folder</li>
 	<li>To secure script based taxonomic name upload with an access key to avoid spamming, specify a n access key in the config file in the <code>WEB-INF/uploadData/</code> folder</li>
 </ul></li>
-<li>If not using an embedded database, create a database for BinoBank in your database server, e.g. </code>BinoBankDB</code></li>
+<li>If not using an embedded database, create a database for BinoBank in your database server, e.g. <code>BinoBankDB</code></li>
 <li>Adjust the <code>web.cnfg</code> file in the <code>WEB-INF</code> folder:<ul>
 	<li>Adjust the JDBC settings to access the database created for BinoBank<br/>
 	(by default configured to use Apache Derby in embedded mode)</li>
@@ -79,7 +79,7 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
 	==&gt; A list of other nodes shows up, labeled <em>Connected Nodes</em></li>
 <li>Configure replication of data in the <em>Connected Nodes</em> table and click the <em>Update Nodes</em> button to submit it<br/>
 	==&gt; afterwards, the web application might be busy for a while importing the taxonomic names from the other nodes via the replication mechanism</li>
-</ul></li>
+</ul>
 <h3>CUSTOMIZING THE LAYOUT</h3>
 <p>The servlets generate the search and upload forms as well as the search results and taxonomic name detail views dynamically from multiple files residing in the <code>WEB-INF</code> folder or one of its sub folders:<ul>
 <li><code>binoBank.html</code> is the template for the main pages</li>
@@ -96,7 +96,7 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
 	<li>The reCAPTCHA widget is inserted where the <code>&lt;includeReCAPTCHA/&gt;</code> tag is in <code>uploadFields.html</code></li>
 	<li>The CSS styles for the upload form and results are in <code>WEB-INF/uploadData/binoBankUpload.css</code></li>
 </ul></li>
-<li></code>onnNodeAdminPage.html</code> is the template for the administration page</li>
+<li><code>onnNodeAdminPage.html</code> is the template for the administration page</li>
 <li>The respective CSS styles are in <code>onnNodeAdminPage.css</code></li>
 <li>To customize general page layout, change the <code>binoBank.html</code> and <code>binoBankPopup.html</code> files and the respective stylesheets<ul>
 	<li>This can be as simple customizing respective CSS styles (can be tested on statically saved post-generation HTML pages)</li>
@@ -108,7 +108,7 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
 	<li>This can include adding new <code>&lt;includeFile .../&gt;</code> tags; when doing this, make sure that the taxonomic names files exist (requires the web application to run for testing)</li>
 </ul></li>
 <li>Do not add header, navigation, or footer content to the <code>binoBank.html</code> or <code>binoBankPopup.html</code> files directly, but use the respective inserted files instead (requires the web application to run for testing)</li>
-</ul></p>
+</ul>
 <h3>THE BinoBank NODE API</h3>
 <p>BinoBank data servlet (<code>/BinoBank/bbk</code>):<ul>
 <li><code>GET</code> (response content depends on <code>action</code> parameter):<ul>
@@ -119,7 +119,7 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
       <code><pre>&lt;nodes&gt;
   &lt;node name=&quot;<i>name of BinoBank node</i>&quot; accessUrl=&quot;<i>preferred access URL of node</i>&quot; /&gt;
   &lt;node ... /&gt;
-&lt;/nodes&gt;</code></pre></li></ul></li>
+&lt;/nodes&gt;</pre></code></li></ul></li>
   <li><code>action=ping</code> (also as <code>/binoBank/bbk/ping</code>): ping node<ul>
     <li>additional parameters: none</li>
     <li>response (MIME type text/xml, encoding UTF-8):
@@ -128,28 +128,38 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
     <li>additional parameters: none</li>
     <li>response (MIME type <code>text/xml</code>, encoding <code>UTF-8</code>):
       <code><pre>&lt;nodes&gt;
-  &lt;node name=&qout;&lt;name of BinoBank node&gt;&qout; accessUrl=&quot;<i>preferred access URL of node</i>&quot; /&gt;
+  &lt;node name=&quot;&lt;name of BinoBank node&gt;&quot; accessUrl=&quot;<i>preferred access URL of node</i>&quot; /&gt;
 &lt;/nodes&gt;</pre></code></li></ul></li>
   <li><code>action=feed</code>: retrieve the taxonomic name update feed, ordered by increasing update time<ul>
     <li>additional parameters:<ul>
       <li><code>updatedSince</code>: minimum update time for taxonomic names to include in the feed, formatted as UTC HTTP timestamp</li></ul></li>
     <li>response: compact feed of taxonomic names updated since the specified timestamp (MIME type <code>text/xml</code>, encoding <code>UTF-8</code>
-      <code><pre>&lt;refSet&gt;
-  &lt;ref id=&quot;<i>taxonomic name ID</i>&quot; canonicalId=&quot;<i>ID of canonical taxonomic name to set</i>&quot; deleted=&quot;<i>deleted flag, true or false</i>&quot; createTime=&quot;<i>UTC timestamp taxonomic name was first added to BinoBank</i>&quot; updateTime=&quot;<i>UTC timestamp taxonomic name was last updated</i>&quot; localUpdateTime=&quot;<i>UTC timestamp taxonomic name was last updated on this BinoBank node</i>&quot; parseChecksum=&quot;<i>MD5 hash of parsed version, if available</i>&quot; /&gt;
-  &lt;ref ... /&gt;
-&lt;/refSet&gt;</pre></code></li></ul></li>
+      <code><pre>&lt;nameSet&gt;
+  &lt;name id=&quot;<i>taxonomic name ID</i>&quot; canonicalId=&quot;<i>ID of canonical taxonomic name to set</i>&quot; deleted=&quot;<i>deleted flag, true or false</i>&quot; createTime=&quot;<i>UTC timestamp taxonomic name was first added to BinoBank</i>&quot; updateTime=&quot;<i>UTC timestamp taxonomic name was last updated</i>&quot; localUpdateTime=&quot;<i>UTC timestamp taxonomic name was last updated on this BinoBank node</i>&quot; parseChecksum=&quot;<i>MD5 hash of parsed version, if available</i>&quot; /&gt;
+  &lt;name ... /&gt;
+&lt;/nameSet&gt;</pre></code></li></ul></li>
+  <li><code>action=rss</code>: retrieve an RSS feed announcing recently added taxonomic names, ordered by decreasing upload time<ul>
+            <li>additional parameters:<ul>
+                <li><code>top</code>: number of names to include in the feed (defaults to 100 if not specified)</li></ul></li>
+            <li>response: an RSS feed announcing the latest additions (MIME type <code>application/rss+xml</code>, encoding <code>UTF-8</code>)</li></ul></li>
+  <li><code>action=count</code>: retrieve the number of taxonomic names stored in the node<ul>
+            <li>additional parameters:<ul>
+                <li><code>since</code>: the UTC timestamp since which to count the names (optional, defaults to 0)</li>
+                <li><code>format</code>: the format to represent the response (optional, defaults to the native XML representation if omitted)</li></ul></li>
+            <li>response: the number of taxonomic names stored in the node (MIME type <code>text/xml</code>, encoding <code>UTF-8</code>)
+            <code><pre>&lt;nameSet count=&quot;number of strings&quot; since=&quot;argument since&quot; /&gt;</pre></code></li></ul></li>
   <li><code>action=get</code>: resolve BinoBank internal identifiers<ul>
     <li>additional parameters:<ul>
-      <li>id: the identifier(s) to resolve, can be multi-valued</li>
-      <li>format: the format to represent the parsed versions of taxonomic names in (optional, defaults to the native DarwinCore + DarwinCore-Additional-Ranks XML representation if omitted)</li></ul></li>
+      <li><code>id</code>: the identifier(s) to resolve, can be multi-valued</li>
+      <li><code>format</code>: the format to represent the parsed versions of taxonomic names in (optional, defaults to the native DarwinCore + DarwinCore-Additional-Ranks XML representation if omitted)</li></ul></li>
     <li>response: the taxonomic name(s) with the specified identifier(s) (MIME type <code>text/xml</code>, encoding <code>UTF-8</code>)
-      <code><pre>&lt;refSet&gt;
-  &lt;ref id=&quot;<i>taxonomic name ID</i>&quot; canonicalId=&quot;<i>ID of canonical taxonomic name to set</i>&quot; deleted=&quot;<i>deleted flag, true or false</i>&quot; createTime=&quot;<i>UTC timestamp taxonomic name was first added to BinoBank</i>&quot; createUser=&quot;<i>name of the user to first add taxonomic name to BinoBank</i>&quot; createDomain=&quot;<i>name of BinoBank node taxonomic name was first added to</i>&quot; updateTime=&quot;<i>UTC timestamp taxonomic name was last updated</i>&quot; updateUser=&quot;<i>name of the user to last update taxonomic name</i>&quot; updateDomain=&quot;<i>name of BinoBank node taxonomic name was last updated at</i>&quot;&gt;
-    &lt;refString&gt;&lt;plain taxonomic name string&gt;&lt;/refString&gt;
-    &lt;refParsed&gt;&lt;parsed version of taxonomic name (if available), as DarwinCore + DarwinCore-Additional-Ranks XML or in format specified by format parameter&gt;&lt;/refParsed&gt;
-  &lt;/ref&gt;
-  &lt;ref&gt;...&lt;/ref&gt;
-&lt;/refSet&gt;</pre></code></li></ul></li>
+      <code><pre>&lt;nameSet&gt;
+  &lt;name id=&quot;<i>taxonomic name ID</i>&quot; canonicalId=&quot;<i>ID of canonical taxonomic name to set</i>&quot; deleted=&quot;<i>deleted flag, true or false</i>&quot; createTime=&quot;<i>UTC timestamp taxonomic name was first added to BinoBank</i>&quot; createUser=&quot;<i>name of the user to first add taxonomic name to BinoBank</i>&quot; createDomain=&quot;<i>name of BinoBank node taxonomic name was first added to</i>&quot; updateTime=&quot;<i>UTC timestamp taxonomic name was last updated</i>&quot; updateUser=&quot;<i>name of the user to last update taxonomic name</i>&quot; updateDomain=&quot;<i>name of BinoBank node taxonomic name was last updated at</i>&quot;&gt;
+    &lt;nameString&gt;&lt;plain taxonomic name string&gt;&lt;/nameString&gt;
+    &lt;nameParsed&gt;&lt;parsed version of taxonomic name (if available), as DarwinCore + DarwinCore-Additional-Ranks XML or in format specified by format parameter&gt;&lt;/nameParsed&gt;
+  &lt;/name&gt;
+  &lt;name&gt;...&lt;/name&gt;
+&lt;/nameSet&gt;</pre></code></li></ul></li>
   <li><code>action=find</code>: search taxonomic names<ul>
     <li>additional parameters:<ul>
       <li><code>query</code>: full text query against taxonomic name strings, can be multi-valued</li>
@@ -164,13 +174,13 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
       <li><code>format=concise</code>: exclude parsed version of taxonomic names from response</li>
       <li><code>format</code>: the name of the format for representing the parsed verion of the taxonomic names (defaults to the native DarwinCore + DarwinCore-Additional-Ranks XML if not specified)</li></ul></li>
     <li>response: the taxonomic name matching the specified search criteria (MIME type <code>text/xml</code>, encoding <code>UTF-8</code>)
-      <code><pre>&lt;refSet&gt;
-  &lt;ref id=&quot;<i><i>taxonomic name ID</i></i>&quot; canonicalId=&quot;<i>ID of canonical taxonomic name to set</i>&quot; deleted=&quot;<i>deleted flag, true or false</i>&quot; createTime=&quot;<i>UTC timestamp taxonomic name was first added to BinoBank</i>&quot; createUser=&quot;<i>name of the user to first add taxonomic name to BinoBank</i>&quot; createDomain=&quot;<i>name of BinoBank node taxonomic name was first added to</i>&quot; updateTime=&quot;<i>UTC timestamp taxonomic name was last updated</i>&quot; updateUser=&quot;<i>name of the user to last update taxonomic name</i>&quot; updateDomain=&quot;<i>name of BinoBank node taxonomic name was last updated at</i>&quot; parseChecksum=&quot;<i>MD5 hash of parsed version, if available and format set to concise</i>&quot;&gt;
-    &lt;refString&gt;&lt;plain taxonomic name string&gt;&lt;/refString&gt;
-    &lt;refParsed&gt;&lt;parsed version of taxonomic name (if available), as DarwinCore + DarwinCore-Additional-Ranks XML or in format specified by format parameter&gt;&lt;/refParsed&gt;
-  &lt;/ref&gt;
-  &lt;ref ...&gt;...&lt;/ref&gt;
-&lt;/refSet&gt;</pre></code></li></ul></li>
+      <code><pre>&lt;nameSet&gt;
+  &lt;name id=&quot;<i><i>taxonomic name ID</i></i>&quot; canonicalId=&quot;<i>ID of canonical taxonomic name to set</i>&quot; deleted=&quot;<i>deleted flag, true or false</i>&quot; createTime=&quot;<i>UTC timestamp taxonomic name was first added to BinoBank</i>&quot; createUser=&quot;<i>name of the user to first add taxonomic name to BinoBank</i>&quot; createDomain=&quot;<i>name of BinoBank node taxonomic name was first added to</i>&quot; updateTime=&quot;<i>UTC timestamp taxonomic name was last updated</i>&quot; updateUser=&quot;<i>name of the user to last update taxonomic name</i>&quot; updateDomain=&quot;<i>name of BinoBank node taxonomic name was last updated at</i>&quot; parseChecksum=&quot;<i>MD5 hash of parsed version, if available and format set to concise</i>&quot;&gt;
+    &lt;nameString&gt;&lt;plain taxonomic name string&gt;&lt;/nameString&gt;
+    &lt;nameParsed&gt;&lt;parsed version of taxonomic name (if available), as DarwinCore + DarwinCore-Additional-Ranks XML or in format specified by format parameter&gt;&lt;/nameParsed&gt;
+  &lt;/name&gt;
+  &lt;name ...&gt;...&lt;/name&gt;
+&lt;/nameSet&gt;</pre></code></li></ul></li>
   <li><code>action=apiStats</code>: retrieve statistics on the usage of the node, in particular for the data handling actions<ul>
             <li>additional parameters:<ul>
                 <li><code>format</code>: the name of the XSLT stylesheet to use for transforming the result (defaults to the native XML if not specified)</li></ul></li>
@@ -183,15 +193,15 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
     <li>request headers to set:<ul>
       <li><code>user</code>: the user to credit for the update</li></ul></li>
     <li>request body:
-      <code><pre>&lt;refSet&gt;
-  &lt;ref id=&quot;<i>taxonomic name ID</i>&quot; canonicalId=&quot;<i>ID of canonical taxonomic name to set</i>&quot; deleted=&quot;<i>deleted flag to set, true or false</i>&quot;/&gt;
-&lt;/refSet&gt;</pre></code></li>
+      <code><pre>&lt;nameSet&gt;
+  &lt;name id=&quot;<i>taxonomic name ID</i>&quot; canonicalId=&quot;<i>ID of canonical taxonomic name to set</i>&quot; deleted=&quot;<i>deleted flag to set, true or false</i>&quot;/&gt;
+&lt;/nameSet&gt;</pre></code></li>
     <li>response (MIME type <code>text/xml</code>, encoding <code>UTF-8</code>):
-      <code><pre>&lt;refSet&gt;
-  &lt;ref id=&quot;<i>taxonomic name ID</i>&quot; canonicalId=&quot;<i>ID of canonical taxonomic name</i>&quot; deleted=&quot;<i>deleted flag, true or false</i>&quot; createTime=&quot;<i>UTC timestamp taxonomic name was first added to BinoBank</i>&quot; createUser=&quot;<i>name of the user to first add taxonomic name to BinoBank</i>&quot; createDomain=&quot;<i>name of BinoBank node taxonomic name was first added to</i>&quot; updateTime=&quot;<i>UTC timestamp taxonomic name was last updated</i>&quot; updateUser=&quot;<i>name of the user to last update taxonomic name</i>&quot; updateDomain=&quot;<i>name of BinoBank node taxonomic name was last updated at</i>&quot; parseChecksum=&quot;<i>MD5 hash of parsed version, if available</i>&quot;&gt;
-    &lt;refString&gt;&lt;plain taxonomic name string&gt;&lt;/refString&gt;
-  &lt;/ref&gt;
-&lt;/refSet&gt;</pre></code></li></ul></li>
+      <code><pre>&lt;nameSet&gt;
+  &lt;name id=&quot;<i>taxonomic name ID</i>&quot; canonicalId=&quot;<i>ID of canonical taxonomic name</i>&quot; deleted=&quot;<i>deleted flag, true or false</i>&quot; createTime=&quot;<i>UTC timestamp taxonomic name was first added to BinoBank</i>&quot; createUser=&quot;<i>name of the user to first add taxonomic name to BinoBank</i>&quot; createDomain=&quot;<i>name of BinoBank node taxonomic name was first added to</i>&quot; updateTime=&quot;<i>UTC timestamp taxonomic name was last updated</i>&quot; updateUser=&quot;<i>name of the user to last update taxonomic name</i>&quot; updateDomain=&quot;<i>name of BinoBank node taxonomic name was last updated at</i>&quot; parseChecksum=&quot;<i>MD5 hash of parsed version, if available</i>&quot;&gt;
+    &lt;nameString&gt;&lt;plain taxonomic name string&gt;&lt;/nameString&gt;
+  &lt;/name&gt;
+&lt;/nameSet&gt;</pre></code></li></ul></li>
   <li><code>/BinoBank/bbk/admin</code>: process input from the BinoBank node administration HTML page (used in browser, not part of API)</li>
   <li><code>/binoBank/bbk/nodes</code>: retrieve list of other BinoBank nodes known to this one<ul>
     <li>request body: none</li>
@@ -227,21 +237,21 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
   <li>request body: the taxonomic names as plain text or wrapped in XML, corresponding to the format specified in the header; to be encoded in <code>UTF-8</code><ul>
     <li><code>Data-Format=txt</code>: one plain taxonomic name string per line, adds new taxonomic names, un-deletes ones that are re-added and were flagged as deleted</li>
     <li><code>Data-Format=xml</code>:
-      <code><pre>&lt;refSet&gt;
-  &lt;ref&gt;
-    &lt;refString&gt;&lt;plain taxonomic name string&gt;&lt;/refString&gt;
-    &lt;refParsed&gt;&lt;parsed taxonomic name in DarwinCore + DarwinCore-Additional-Ranks XML, if available&gt;&lt;/refParsed&gt;
-  &lt;/ref&gt;
-  &lt;ref&gt;...&lt;/ref&gt;
-&lt;/refSet&gt;</pre></code></li></ul></li>
+      <code><pre>&lt;nameSet&gt;
+  &lt;name&gt;
+    &lt;nameString&gt;&lt;plain taxonomic name string&gt;&lt;/nameString&gt;
+    &lt;nameParsed&gt;&lt;parsed taxonomic name in DarwinCore + DarwinCore-Additional-Ranks XML, if available&gt;&lt;/nameParsed&gt;
+  &lt;/name&gt;
+  &lt;name&gt;...&lt;/name&gt;
+&lt;/nameSet&gt;</pre></code></li></ul></li>
   <li>response: update statistice (MIME type <code>text/xml</code>, encoding <code>UTF-8</code>), in particular the uploaded or otherwise updated taxonomic names, with attributes indicating whether they were updated or alltogether newly added to BinoBank:
-    <code><pre>&lt;refSet created=&quot;<i>number of taxonomic names newly added to BinoBank</i>&quot; updated=&quot;<i>number of taxonomic names updated, less newly created ones</i>&quot;&gt;
-  &lt;ref id=&quot;<i>taxonomic name ID</i>&quot; canonicalId=&quot;<i>ID of canonical taxonomic name</i>&quot; deleted=&quot;<i>deleted flag, true or false</i>&quot; createTime=&quot;<i>UTC timestamp taxonomic name was first added to BinoBank</i>&quot; updateTime=&quot;<i>UTC timestamp taxonomic name was last updated</i>&quot; parseChecksum=&quot;<i>MD5 hash of parsed version, if available</i>&quot; parseError=&quot;<i>explanation why parsed version was rejected, if any</i>&quot; created=&quot;<i>true or false, indicating whether taxonomic name was newly added to BinoBank</i>&quot; updated=&quot;<i>true or false, indicating whether taxonomic name existed and was updated</i>&quot;&gt;
-    &lt;refString&gt;&lt;plain taxonomic name string, as stored in BinoBank&gt;&lt;/refString&gt;
-  &lt;/ref&gt;
-  &lt;ref ...&gt;...&lt;/ref&gt;
-&lt;/refSet&gt;</pre></code></li></ul></li>
-</ul></p>
+    <code><pre>&lt;nameSet created=&quot;<i>number of taxonomic names newly added to BinoBank</i>&quot; updated=&quot;<i>number of taxonomic names updated, less newly created ones</i>&quot;&gt;
+  &lt;name id=&quot;<i>taxonomic name ID</i>&quot; canonicalId=&quot;<i>ID of canonical taxonomic name</i>&quot; deleted=&quot;<i>deleted flag, true or false</i>&quot; createTime=&quot;<i>UTC timestamp taxonomic name was first added to BinoBank</i>&quot; updateTime=&quot;<i>UTC timestamp taxonomic name was last updated</i>&quot; parseChecksum=&quot;<i>MD5 hash of parsed version, if available</i>&quot; parseError=&quot;<i>explanation why parsed version was rejected, if any</i>&quot; created=&quot;<i>true or false, indicating whether taxonomic name was newly added to BinoBank</i>&quot; updated=&quot;<i>true or false, indicating whether taxonomic name existed and was updated</i>&quot;&gt;
+    &lt;nameString&gt;&lt;plain taxonomic name string, as stored in BinoBank&gt;&lt;/nameString&gt;
+  &lt;/name&gt;
+  &lt;name ...&gt;...&lt;/name&gt;
+&lt;/nameSet&gt;</pre></code></li></ul></li>
+</ul>
 <p>BinoBank search servlet (<code>/BinoBank/search</code>):<ul>
 <li><code>GET</code>: retrieve search form, perform search, or retrieve styled or formatted taxonomic name, depending on parameters:<ul>
   <li><code>id</code>: identifier of taxonomic name, yields taxonomic name specific response if set, depending on several other parameters:<ul>
@@ -265,7 +275,7 @@ If you have WebAppUpdater (builds with idaho-core) installed, you can also simpl
   <li>no parameters at all: response is HTML page with search form (used in browser, not part of API)</li>
 </ul></li>
 <li><code>POST</code> (used in browser, not part of API): receive update callbacks from search result page</li>
-</ul></p>
+</ul>
 <p>BinoBank upload servlet (<code>/BinoBank/upload</code>):<ul>
 <li><code>GET</code> (used in browser, not part of API):<ul>
   <li><code>/BinoBank/upload</code>: retrieve upload form</li>
@@ -286,13 +296,14 @@ ERRORS: &lt;number of taxonomic names that contain errors&gt;
 CREATED: &lt;number of taxonomic names newly added to BinoBank&gt;
 UPDATED: &lt;number of taxonomic names that were not newly added, but had their parsed version updated&gt;</pre></code></li>
 </ul></li>
-</ul></p>
+</ul>
 <p>BinoBank data index servlet (<code>/BinoBank/data</code>):<ul>
 <li><code>GET</code>: retrieve a list of taxonomic name attribute values present from parsed taxonomic names in BinoBank, for use as a gazetteer<ul>
   <li>parameters:<ul>
     <li><code>type</code>: the type of data to retrieve</li></ul></li>
   <li>response: list of epithets of requested rank or rank group (MIME type <code>text/plain</code>, encoding <code>UTF-8</code>)</li>
-</ul></p>
+</ul></li>
+</ul>
 </div>
 </body>
 </html>
