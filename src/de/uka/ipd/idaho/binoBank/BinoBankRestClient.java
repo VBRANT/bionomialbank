@@ -23,8 +23,7 @@ import java.net.URLEncoder;
 import de.uka.ipd.idaho.onn.stringPool.StringPoolRestClient;
 
 /**
- * RefBank specific rest client, adding detail search for bibliographic
- * references.
+ * BinoBank specific REST client, adding detail search for taxonomic names.
  * 
  * @author sautter
  */

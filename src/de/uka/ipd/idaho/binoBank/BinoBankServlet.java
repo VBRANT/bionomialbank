@@ -41,7 +41,6 @@ import de.uka.ipd.idaho.stringUtils.StringVector;
 
 /**
  * @author sautter
- *
  */
 public class BinoBankServlet extends StringPoolServlet implements BinoBankClient, BinoBankConstants {
 	
@@ -109,6 +108,7 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 	}
 	
 	private TaxonomicRankSystem rankSystem;
+	private RankGroup[] rankGroups;
 	
 	/* (non-Javadoc)
 	 * @see de.uka.ipd.idaho.onn.stringPool.StringPoolServlet#doInit()
@@ -118,6 +118,16 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 		
 		//	get generic rank system (we'll be handling names from all domains)
 		this.rankSystem = TaxonomicRankSystem.getRankSystem(null);
+		
+		//	cache rank system details
+		this.rankGroups = this.rankSystem.getRankGroups();
+	}
+	
+	/* (non-Javadoc)
+	 * @see de.uka.ipd.idaho.onn.stringPool.StringPoolServlet#getXmlNamespaceUriBindings()
+	 */
+	protected String getXmlNamespaceUriBindings() {
+		return "xmlns:dwc=\"http://digir.net/schema/conceptual/darwin/2003/1.0\" xmlns:dwcranks=\"http://rs.tdwg.org/UBIF/2006/Schema/1.1\"";
 	}
 	
 	/* (non-Javadoc)
@@ -147,14 +157,14 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 	protected void extendIndexData(ParsedStringIndexData indexData, MutableAnnotation stringParsed) {
 		
 		//	get index data
-		NameIndexData refIndexData = this.getIndexData(stringParsed);
+		NameIndexData nameIndexData = this.getIndexData(stringParsed);
 		
 		//	add attributes
-		indexData.addIndexAttribute(HIGHER_RANK_GROUP_COLUMN_NAME, refIndexData.higher.toLowerCase());
-		indexData.addIndexAttribute(FAMILY_RANK_GROUP_COLUMN_NAME, refIndexData.family.toLowerCase());
-		indexData.addIndexAttribute(GENUS_RANK_GROUP_COLUMN_NAME, refIndexData.genus.toLowerCase());
-		indexData.addIndexAttribute(SPECIES_RANK_GROUP_COLUMN_NAME, refIndexData.species.toLowerCase());
-		indexData.addIndexAttribute(AUTHORITY_COLUMN_NAME, refIndexData.authority.toLowerCase());
+		indexData.addIndexAttribute(HIGHER_RANK_GROUP_COLUMN_NAME, nameIndexData.higher.toLowerCase());
+		indexData.addIndexAttribute(FAMILY_RANK_GROUP_COLUMN_NAME, nameIndexData.family.toLowerCase());
+		indexData.addIndexAttribute(GENUS_RANK_GROUP_COLUMN_NAME, nameIndexData.genus.toLowerCase());
+		indexData.addIndexAttribute(SPECIES_RANK_GROUP_COLUMN_NAME, nameIndexData.species.toLowerCase());
+		indexData.addIndexAttribute(AUTHORITY_COLUMN_NAME, nameIndexData.authority.toLowerCase());
 	}
 	
 	/*
@@ -203,17 +213,16 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 		StringBuffer species = new StringBuffer();
 		
 		//	collect epithets
-		RankGroup[] rankGroups = this.rankSystem.getRankGroups();
-		for (int g = 0; g < rankGroups.length; g++) {
+		for (int g = 0; g < this.rankGroups.length; g++) {
 			StringBuffer target;
-			if (SPECIES_ATTRIBUTE.equals(rankGroups[g].name))
+			if (SPECIES_ATTRIBUTE.equals(this.rankGroups[g].name))
 				target = species;
-			else if (GENUS_ATTRIBUTE.equals(rankGroups[g].name))
+			else if (GENUS_ATTRIBUTE.equals(this.rankGroups[g].name))
 				target = genus;
-			else if (FAMILY_ATTRIBUTE.equals(rankGroups[g].name))
+			else if (FAMILY_ATTRIBUTE.equals(this.rankGroups[g].name))
 				target = family;
 			else target = higher;
-			Rank[] ranks = rankGroups[g].getRanks();
+			Rank[] ranks = this.rankGroups[g].getRanks();
 			for (int r = 0; r < ranks.length; r++) {
 				target.append('|');
 				String epithet = taxName.getEpithet(ranks[r].name);
@@ -252,8 +261,11 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 		StringVector extraTokens = new StringVector();
 		
 		Annotation[] rankAnnots = stringParsed.getAnnotations("dwc:taxonRank");
-		for (int r = 0; r < rankAnnots.length; r++)
-			addTokens(extraTokens, rankAnnots[r]);
+		for (int r = 0; r < rankAnnots.length; r++) {
+			if (this.rankSystem.getRank(rankAnnots[r].getValue()) != null)
+				addTokens(extraTokens, rankAnnots[r]);
+			else return ("Parsed string is inconsistent: '" + rankAnnots[r].getValue() + "' is not a valid rank");
+		}
 		
 		for (int t = 0; (t < stringParsed.size()) && (parseError == null); t++) {
 			String value = stringParsed.valueAt(t);
@@ -266,7 +278,6 @@ public class BinoBankServlet extends StringPoolServlet implements BinoBankClient
 		
 		return parseError;
 	}
-	
 	private static void addTokens(StringVector tokens, Annotation annot) {
 		for (int t = 0; t < annot.size(); t++)
 			tokens.addElement(annot.valueAt(t));
