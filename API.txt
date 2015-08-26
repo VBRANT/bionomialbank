@@ -9,7 +9,7 @@ BinoBank data servlet (/BinoBank/bbk):
             response (MIME type text/xml, encoding UTF-8):
 
             <nodes>
-              <node name="name of BinoBank node" accessUrl="prefered access URL of node" />
+              <node name="name of BinoBank node" accessUrl="preferred access URL of node" />
               <node ... />
             </nodes>
 
@@ -54,7 +54,7 @@ BinoBank data servlet (/BinoBank/bbk):
             additional parameters:
                 id: the identifier(s) to resolve, can be multi-valued
                 format: the format to represent the parsed versions of names in (optional, defaults to the native MODS XML representation if omitted)
-            response: the name(s) with the speciefied identifier(s) (MIME type text/xml, encoding UTF-8)
+            response: the name(s) with the specified identifier(s) (MIME type text/xml, encoding UTF-8)
 
             <nameSet>
               <name id="name ID" canonicalId="ID of canonical name" deleted="deleted flag, true or false" createTime="UTC timestamp name was first added to BinoBank" createUser="name of the user to first add name to BinoBank" createDomain="name of BinoBank node name was first added to" updateTime="UTC timestamp name was last updated" updateUser="name of the user to last update name" updateDomain="name of BinoBank node name was last updated at">
@@ -75,8 +75,8 @@ BinoBank data servlet (/BinoBank/bbk):
                 genus: query against genus group epithets, i.e., genus down to subseries, only finds names with parsed version available
                 species: query against species group epithets, i.e., species aggregate and below, only finds names with parsed version available
                 authority: query against name authority, only finds names with parsed version available
-                format=concise: exclude parsed verion of names from response
-                format: the name of the format for representing the parsed verion of the names (defaults to the native MODS XML if not specified)
+                format=concise: exclude parsed version of names from response
+                format: the name of the format for representing the parsed version of the names (defaults to the native MODS XML if not specified)
                 limit: the maximum number of names to include in the search result (0, the default, means no limit)
             response: the names matching the specified search criteria (MIME type text/xml, encoding UTF-8)
 
@@ -95,7 +95,7 @@ BinoBank data servlet (/BinoBank/bbk):
 
             <apiStats total="total number of API calls" feed="number of calls to feed action" rss="number of calls to RSS feed action" find="number of calls to find action" get="number of calls to get action" update="number of calls to update action" count="number of calls to count action" stats="number of calls to API statistics"/>
 
-    POST: requests from BinoBank node adminstration HTML page, infrastructure replication, or meta data updates for existing names:
+    POST: requests from BinoBank node administration HTML page, infrastructure replication, or meta data updates for existing names:
 
         /BinoBank/bbk/update: for deleting or un-deleting existing names or updating canonical name ID
             request headers to set:
@@ -121,7 +121,7 @@ BinoBank data servlet (/BinoBank/bbk):
             response (MIME type text/xml, encoding UTF-8):
 
             <nodes>
-              <node name="name of BinoBank node" accessUrl="prefered access URL of node" />
+              <node name="name of BinoBank node" accessUrl="preferred access URL of node" />
               <node ... />
             </nodes>
 
@@ -136,17 +136,17 @@ BinoBank data servlet (/BinoBank/bbk):
             response (MIME type text/xml, encoding UTF-8):
 
             <nodes>
-              <node name="name of BinoBank node" accessUrl="prefered access URL of node" />
+              <node name="name of BinoBank node" accessUrl="preferred access URL of node" />
             </nodes>
 
         /BinoBank/bbk/introduce: introduce a new BinoBank node to this one, retrieve list of other known BinoBank nodes
             request body (parameters):
                 name: the name of the BinoBank node introducing itself
-                accessUrl: the prefered access URL of the BinoBank node introducing itself
+                accessUrl: the preferred access URL of the BinoBank node introducing itself
             response (MIME type text/xml, encoding UTF-8):
 
             <nodes>
-              <node name="name of BinoBank node" accessUrl="prefered access URL of node" />
+              <node name="name of BinoBank node" accessUrl="preferred access URL of node" />
               <node ... />
             </nodes>
 
@@ -167,7 +167,7 @@ BinoBank data servlet (/BinoBank/bbk):
               <name>...</name>
             </nameSet>
 
-        response: update statistice (MIME type text/xml, encoding UTF-8), in particular the uploaded or otherwise updated names, with attributes indicating whether they were updated or alltogether newly added to BinoBank:
+        response: update statistics (MIME type text/xml, encoding UTF-8), in particular the uploaded or otherwise updated names, with attributes indicating whether they were updated or alltogether newly added to BinoBank:
 
         <nameSet created="number of names newly added to BinoBank" updated="number of names updated, less newly created ones">
           <name id="name ID" canonicalId="ID of canonical name" deleted="deleted flag, true or false" createTime="UTC timestamp name was first added to BinoBank" updateTime="UTC timestamp name was last updated" parseChecksum="MD5 hash of parsed version, if available" parseError="explanation why parsed version was rejected, if any" created="true or false, indicating whether name was newly added to BinoBank" updated="true or false, indicating whether name existed and was updated">
@@ -182,7 +182,7 @@ BinoBank search servlet (/BinoBank/search):
     GET: retrieve search form, perform search, or retrieve styled or formatted name, depending on parameters:
         id: identifier of name, yields name specific response if set, depending on several other parameters:
             format: name format, for use with other software
-            isFramePage: send name specific pupup page instead of name proper?
+            isFramePage: send name specific popup page instead of name proper?
             combinations of the id and format parameters return different results:
                 id + format=PaRsEtHeNaMe + isFramePage=true: name specific popup page, with name opened for manual parsing in embedded IFrame (used in browser, not part of API)
                 id + format=EdItNaMeStRiNg + isFramePage=true: name specific popup page, with name string opened for manual editing in embedded IFrame (used in browser, not part of API)
@@ -219,7 +219,7 @@ BinoBank upload servlet (/BinoBank/upload):
             Data-Format: name of the name data format used in request body (one of the formats selectable in the upload form)
             User-Name: the name of the user to credit for the contributed names
             Access-Key: the upload access key; needs to match configured key for servlet to accept the upload, ignored if no key is configured
-        request body: names in format inidcated in header
+        request body: names in format indicated in header
         response: upload result statistics (MIME type text/plain, encoding UTF-8)
 
         RECEIVED: <number of names received>
